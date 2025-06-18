@@ -13,3 +13,11 @@
 - Classe DELETE : public Request
 
 - Faire une classe mère avec un retour. et construire dessus des classes filles suivant le type de retour
+
+
+GET : 
+Host
+
+
+POST : 
+contentype et contentlen + body
