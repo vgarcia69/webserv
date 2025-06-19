@@ -1,27 +1,37 @@
+#include "Request.hpp"
 #include <iostream>
-#include <map>
+#include <fstream>
 #include <string>
 
-int main() {
-    // Déclaration d'une map qui associe un string à un int
-    std::map<std::string, std::string> age;
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <request_file1> [request_file2 ...]" << std::endl;
+        return 1;
+    }
 
-    // Ajout d'éléments
-    age["Alice"] = "25";
-    age["Bob"] = "30";
-    age["Charlie"] = "22";
-	age["Test"] = "21";
+    // Parcourir tous les fichiers passés en argument
+    for (int i = 1; i < argc; i++) {
+        std::cout << "\nParsing file: " << argv[i] << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
 
-	const std::string test= "Bob";
-    // Accès à un élément
-    std::cout << "L'âge de Bob est " << age[test] << " ans." << std::endl;
-    std::cout << "L'âge de Bob est " << age[test] << " ans." << std::endl;
-    std::cout << "L'âge de Bob est " << age[test] << " ans." << std::endl;
-    std::cout << "L'âge de Bob est " << age[test] << " ans." << std::endl;
+        // Ouvrir le fichier
+        std::ifstream file(argv[i]);
+        if (!file.is_open()) {
+            std::cerr << "Error: Cannot open file " << argv[i] << std::endl;
+            continue;
+        }
 
-    // Boucle sur tous les éléments
-    for (const auto& pair : age) {
-        std::cout << pair.first << " a " << pair.second << " ans." << std::endl;
+        // Créer et parser la requête
+        Request request;
+        request.parsRequest(file);
+
+        // if (request.getError().empty())
+            std::cout << request;
+        // else
+            // std::cout << request.getError() << std::endl;
+
+        file.close();
+        std::cout << "----------------------------------------\n" << std::endl;
     }
 
     return 0;

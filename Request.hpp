@@ -2,33 +2,43 @@
 # define REQUEST_HPP
 
 #include <string>
+#include <iostream>
+#include <fstream>
 #include <map>
 #include <vector>
 
 class Request {
-protected :
+private :
 	std::string		_method;
 	std::string		_URI;									// URI : Uniform Resource Identifier
 	float			_httpVersion;
 	std::map<std::string, std::string>	_header;
 	std::string		_body;
+	std::string		_error;
+
+	void	parsFirstLine(std::istream & clientRequest);
+	void	parsHeader(std::istream & clientRequest);
+	void	parsBody(std::istream & clientRequest);
 
 public :
 	Request();
-	~Request();
+	~Request(){};
+
+
+	void		parsRequest(std::istream & clientRequest);
+	
 
 	//getter
 	const std::string& getMethod() const { return _method; }
 	const std::string& getURI() const { return _URI; }
 	float getHttpVersion() const { return _httpVersion; }
 	const std::map<std::string, std::string>& getHeader() const { return _header; }
+	std::string getHeader(const std::string& key) {return _header[key];} ;
 	const std::string& getBody() const { return _body; }
-
-
-	//std::string getHeader(const std::string& key) const /*{return _header[key] ;}*/;
-	std::string getHeader(const std::string& key) const ;
-	bool		parsRequest(int client_fd);
-
+	const std::string& getError() const { return _error; }
 };
+
+
+std::ostream & operator<<(std::ostream &o, Request & request);
 
 #endif

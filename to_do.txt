@@ -21,3 +21,5 @@ Host
 
 POST : 
 contentype et contentlen + body
+/*********************************************** boundary
+
