@@ -1,29 +1,28 @@
 #include "Request.hpp"
-#include <sstream>
-#include <cctype>
-#include <set>
-
-Request::Request(void) : _httpVersion(0){}
 
 
-void	Request::parsFirstLine(std::istream & clientRequest) {
+
+Request::Request(void){}
+
+
+void		Request::parsFirstLine(std::istream & clientRequest) {
 	std::string line;
 	std::getline(clientRequest, line);
 	if (line.empty()){
-		_error =  "Bad input in the first line.";
+		_error =  "400 – Bad Request";
 		return ;
 	}
 	size_t	space1 = line.find(' ');
 	_method = line.substr(0, space1);
 	
-	static const std::set<std::string> validMethods = {"GET", "POST", "DELETE"};
-	if (validMethods.find(_method) == validMethods.end()){
-		_error =  "Bad input in the first line.";
+
+	if (_validMethods.find(_method) == _validMethods.end()){
+		_error =  "405 – Method Not Allowed";
 		return ;
 	}
 
 	if (space1 == std::string::npos){
-		_error =  "Bad input in the first line.";
+		_error =  "400 – Bad Request";
 		return ;
 	}
 	++space1;
@@ -31,114 +30,143 @@ void	Request::parsFirstLine(std::istream & clientRequest) {
 	_URI = line.substr(space1, space2 - space1);
 	
 	if (space2 == std::string::npos || _URI.empty()){
-		_error =  "Bad input in the first line.";
+		_error =  "400 – Bad Request";
 		return ;
 	}
-	
+
 	++space2;
 	if(line.find(' ', space2) != std::string::npos){
-		_error =  "Bad input in the first line.";
+		_error =  "400 – Bad Request";
 		return ;
 	}
 
 	std::string version = line.substr(space2);
-	if (version != "HTTP/1.1")
+	if (version != "HTTP/1.1" && version != "HTTP/1.1\r")
 	{
-		_error="Bad input in the first line.";
+		_error="505 - HTTP Version Not Supported";
 		return ;
 	}
-	_httpVersion = 1.1;
 }
 
+
+std::string	to_lower(std::string & input);
 
 void		Request::parsHeader(std::istream & clientRequest){
 	std::string	line;
 
 	std::getline(clientRequest, line);
 	while(line.empty() == false){
+		to_lower(line);
 		if (clientRequest.eof()){
-			_error = "No empty line after Header";
+			_error = "400 – Bad Request";
 			return ;
 		}
 		size_t	posSep = line.find(':');
-		if (posSep == std::string::npos || posSep >= line.length() + 3){
-			_error = "Bad input in the Header.";
+		if (posSep == std::string::npos || posSep >= line.length() + 2){	//+2 for :	_header[key] = line.substr(posSep + 1);
+			_error = "400 – Bad Request";
 			return ;
 		}
-		_header[line.substr(0, posSep)] = line.substr(posSep + 2);
+		std::string value = line.substr(posSep + 1);
+		if (!value.empty() && value[0] == ' ') {
+			value.erase(0, 1);
+		}
+		_header[line.substr(0, posSep)] = value;
+		if (!line.empty() && line[value.length() - 1] == '\r') {
+			value.erase(value.size() - 1, 1);
+		}
 		std::getline(clientRequest, line);
 	}
 
+
 	//test the validity of the header
 
-	if (_header.find("Host") == _header.end()){
-		_error = "No Host.";
+	if (_header.find("host") == _header.end()) {
+		_error = "400 – Bad Request";
 		return ;
 	}
 
-	if (_header.find("Truc") == _header.end()) ;
-
 	if (_method == "POST"){
-		if (_header.find("Content-Type") == _header.end()){
-			_error = "No Content-Type on a POST Request.";
+		if (_header.find("content-type") == _header.end()){
+			_error = "400 – Bad Request";
 			return ;
 		}
-		/*----------------------------------------- CHECKER TOUTE LES POSSIBILITER D'UNE REQUETES POST---------------------------*/
-		// if (_header.find("Content-Length") == _header.end() && _header.find("Transfer-Encoding") != "chunked"){
-		// 	_error = "No Content-Length on a POST Request.";
-		// 	return ;
-		// }
-		// if (_header.find("Content-Length") != _header.end()  && _header.find("Transfer-Encoding") == "chunked"){
-		// 	_error = "error 400";
-		// 	return ;
-		// }
+		std::string	TransferEncoding;
+		if (_header.find("transfer-encoding") != _header.end()){
+			TransferEncoding = _header["transfer-encoding"];
+			if (TransferEncoding != "chunked")
+				TransferEncoding = "";
+		}
+		//case no content-lenght and no TransferEncoding "chunked"
+		if (_header.find("content-length") == _header.end() && TransferEncoding.empty()){
+			_error = "400 – Bad Request";
+			return ;
+		}
+		if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
+			_error = "400 – Bad Request";
+			return ;
+		}
 	}
 }
 
 
 void		Request::parsBody(std::istream & clientRequest){
-	if (_method != "POST"){
+	if (_method != "POST") {
 		if (clientRequest.eof() == false)
-			_error = "No POST methode have a body.";
+			_error = "400 – Bad Request";
 		return ;
 	}
 
 	//case of POST method
-	if (_header.find("Content-Length") != _header.end()){
-		 
-		size_t nb_char = strtol(_header["Content-Length"].c_str(), NULL, 10);
+
+	//case of content-lenght:
+	if (_header.find("content-length") != _header.end()){
+		size_t nb_char = strtol(_header["content-length"].c_str(), NULL, 10);
 		if (errno == ERANGE || nb_char < 0){
 			errno = 0;
-			_error = "Nomber of Content-Length is too big or negative.";
+			_error = "400 – Bad Request";
 			return ;
 		}
-
-		std::cout << "Il faut finir le travail " << nb_char <<std::endl;
-
+		char buffer[nb_char + 1];
+		clientRequest.read(buffer, nb_char + 1);
+		if (clientRequest.eof() == false){
+			_error = "400 – Bad Request";
+			return ;
+		}
+		_body = buffer;
+		return ;
 	}
+	//case of transfer encoding "chunked"
+	std::string line;
+	std::getline(clientRequest, line);	
 }
 
 void		Request::parsRequest(std::istream & clientRequest){
 
 	parsFirstLine(clientRequest);
 	if (_error.empty() == false)
-		return ; 
+		return ;
+	std::cout << "first line pass" <<std::endl;
 	parsHeader(clientRequest);
 	if (_error.empty() == false)
 		return ;
+	std::cout << "seconde line pass" <<std::endl;
+
 	parsBody(clientRequest);
 }
 
 std::ostream & operator<<(std::ostream &o, Request & request) {
 	o << "===== REQUEST INFO =====" << "\n";
+	if (request.getError().empty() == false){
+		o << request.getError();
+		o << "\n===================" << std::endl;
+		return o;
+	}
 	o << "Method: " << request.getMethod() << "\n";
 	o << "URI: " << request.getURI() << "\n";
-	o << "HTTP Version: " << request.getHttpVersion() << "\n";
 
 	o << "\n----- Headers -----" << "\n";
 	const std::map<std::string, std::string>& headers = request.getHeader();
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); 
-		 it != headers.end(); ++it) {
+	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it) {
 		o << it->first << ": " << it->second << "\n";
 	}
 	if(request.getMethod() == "POST"){
@@ -147,7 +175,16 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 	}
 	else
 		o << "\n----- no body ------\n";
-		
 	o << "===================" << std::endl;
 	return o;
 }
+
+std::set<std::string> creatValidMethode(void){
+	std::set<std::string> m;
+	m.insert("GET");
+	m.insert("POST");
+	m.insert("DELETE");
+	return m;
+};
+
+const std::set<std::string> Request::_validMethods = creatValidMethode();

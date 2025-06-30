@@ -23,3 +23,40 @@ POST :
 contentype et contentlen + body
 /*********************************************** boundary
 
+
+Codes Statut chercher si sous status
+    200 succès 
+    300 redirection
+
+
+Client Error Responses:
+
+    400 – Bad Request
+
+    403 – Forbidden
+
+    404 – Not Found
+
+    405 – Method Not Allowed
+
+    413 – Payload Too Large (if you enforce client_max_body_size)
+
+    414 – URI Too Long
+
+    429 – Too Many Requests (optional, for bonus rate-limiting)
+
+
+Server Error Responses:
+
+
+    500 – Internal Server Error (for general/unknown server-side problems)
+
+    501 – Not Implemented (if method is unsupported)
+
+    502 – Bad Gateway (for CGI errors or upstream problems)
+
+    503 – Service Unavailable (e.g., if your server is overloaded)
+
+    504 – Gateway Timeout (optional, for CGI timeouts)
+
+    505 - HTTP Version Not Supported

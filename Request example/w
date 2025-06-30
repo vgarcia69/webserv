@@ -1,3 +1,0 @@
-DELETE /api/users/123 HTTP/1.1
-Host: example.com
-Authorization: Bearer your_token_here
