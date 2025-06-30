@@ -1,60 +1,34 @@
 #include "Config.hpp"
 
-static ParsingState isServerFound(std::string& currentWord)
+void	lookingFor(std::stringstream& content, std::string target, const char* errorMessage)
 {
-	std::string serverKeyword = "server";
+	std::string keyWord;
 
-	for (unsigned i = 0; i < serverKeyword.size(); i++)
-	{
-		if (!currentWord[i] || serverKeyword[i] != currentWord[i])
-			return ERROR;
-	}
-	currentWord = currentWord.substr(6);
-	return LOOKING_FOR_SERVER_BLOCK;
+	content >> keyWord;
+	if (keyWord != target)
+		throw std::runtime_error(errorMessage);
 }
 
-ParsingState	lookingForServerCall(std::fstream& infile, std::string& currentLine)
+void	ParsingServerInfo(std::stringstream& sequencedLine, ParsingState& state, Server& server)
 {
-	unsigned	i = 0;
+	std::string			keyWord;
+	std::string			info;
 
-	while (std::getline(infile, currentLine))
+	sequencedLine >> keyWord;
+	if (keyWord == "location")
 	{
-		while (iswblank(currentLine[i]) && i < currentLine.size())
-		{
-			i++;
-		}
-		if (currentLine[i])
-		{
-			currentLine = currentLine.substr(i);
-			return isServerFound(currentLine);
-		}
+		sequencedLine >> info;
+		server.addLocation(info);
+		state = LOOKING_FOR_LOCATION_BLOCK;
 	}
-	return ERROR;
+	else 
+	{
+		std::getline(sequencedLine, info, ';');
+		server.addInfo(keyWord, info);
+	}
 }
 
-void	lookingForBracket(std::fstream& infile, std::string& currentLine)
-{
-	unsigned	i = 0;
+// void	ParsingLocationInfo(std::stringstream& sequencedLine, std::string& line, ParsingState& state, Server& server)
+// {
 
-	while (!infile.eof())
-	{
-		while (iswblank(currentLine[i]) && i < currentLine.size())
-		{
-			i++;
-		}
-		if (currentLine[i])
-		{
-			if (currentLine[i] == '{')
-			{
-				currentLine = currentLine.substr(i + 1);
-				return ;
-			}
-			else
-			{
-				throw std::runtime_error("Was expecting bracket");
-			}
-		}
-		std::getline(infile, currentLine);
-	}
-	throw std::runtime_error("File Format Error");
-}
+// }

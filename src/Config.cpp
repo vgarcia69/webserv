@@ -2,18 +2,20 @@
 
 Config::Config()
 {
-
+	// find a default configuration ?
 }
 
-Config::Config(const std::string& configFile)
+Config::Config(const std::string &configFile, Server& currentServer)
 {
-	ParsingState	state = GLOBAL;
-	std::string		currentString;
-	std::fstream	configIn;
+	ParsingState		state = GLOBAL;
+	std::stringstream	content;
+	std::fstream		configIn;
 
 	configIn.open(configFile.c_str(), std::ios::in);
 	if (!configIn.is_open())
 		throw std::exception();
+
+	content << configIn.rdbuf();
 
 	while (1)
 	{
@@ -21,28 +23,26 @@ Config::Config(const std::string& configFile)
 		{
 			case GLOBAL:
 			{
-				state = lookingForServerCall(configIn, currentString);
-				break ;
-			}
-			case LOOKING_FOR_SERVER_BLOCK: // get whole line
-			{
-				lookingForBracket(configIn, currentString);
+				lookingFor(content, "server", ERROR_SERVERBLOCK);
+				lookingFor(content, "{", ERROR_BRACKET);
+				//clear currentServer;
 				state = SERVER_BLOCK;
+			}
+			case SERVER_BLOCK:
+			{
+				ParsingServerInfo(content, state, currentServer);
 				break ;
 			}
-			case SERVER_BLOCK: // get line limited ;
+			case LOOKING_FOR_LOCATION_BLOCK:
 			{
-				// ParsingServerConfig();
-			}
-			case LOOKING_FOR_LOCATION_BLOCK: // get whole line
-			{
-				lookingForBracket(configIn, currentString);
+				//clear currentLocation
+				// lookingForBracket(configIn, currentString);
 				state = LOCATION_BLOCK;
-				break ;
 			}
 			case LOCATION_BLOCK: // get line limited ;
 			{
-				// ParsingLocationConfig();
+				// ParsingLocationInfo(configIn, currentString, state, currentServer);
+				break ;
 			}
 			default:
 			{
@@ -54,5 +54,4 @@ Config::Config(const std::string& configFile)
 
 Config::~Config()
 {
-
 }

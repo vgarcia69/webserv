@@ -6,20 +6,20 @@
 #    By: vgarcia <vgarcia@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/22 18:42:56 by vincentgarc       #+#    #+#              #
-#    Updated: 2025/06/27 09:54:33 by vgarcia          ###   ########.fr        #
+#    Updated: 2025/06/30 13:12:12 by vgarcia          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv 
 
-SRCFILE = main Config Server parsing
+SRCFILE = main Config Server Location parsing
 SRCDIR= src/
 SRCFORMAT=.cpp
 SRCFILE := $(addprefix $(SRCDIR), $(SRCFILE))
 SRCFILE := $(addsuffix $(SRCFORMAT), $(SRCFILE))
 CXX = c++
 INCLUDE = include
-FLAGS = -Wall -Wextra -Werror -std=c++98 -I$(INCLUDE) -MMD
+FLAGS = -Wall -Wextra -Werror -std=c++98 -I$(INCLUDE) -MMD -g3
 
 OBJ_DIR = .obj/
 

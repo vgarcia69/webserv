@@ -4,21 +4,23 @@ int main(int ac, char **av)
 {
 	if (ac > 2)
 	{
-		// write something
+		std::cerr << "Wrong Amount of Args" << std::endl;
 		return 1;
 	}
 
-	// parse config
-	try{
-	Config config(av[1]);
+	Server server;
+
+	try
+	{
+		Config config(av[1], server);
 	}
 	catch (std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
+		return 1;
 	}
-	// init server with parsed config
 
-	// run server
+	server.run();
 
 	return 0;
 }
