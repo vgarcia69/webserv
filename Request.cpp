@@ -55,6 +55,9 @@ void		Request::parsHeader(std::istream & clientRequest){
 	std::string	line;
 
 	std::getline(clientRequest, line);
+	if (!line.empty() && line[line.length() - 1] == '\r') {
+			line.erase(line.size() - 1, 1);
+		}
 	while(line.empty() == false){
 		to_lower(line);
 		if (clientRequest.eof()){
@@ -71,10 +74,10 @@ void		Request::parsHeader(std::istream & clientRequest){
 			value.erase(0, 1);
 		}
 		_header[line.substr(0, posSep)] = value;
-		if (!line.empty() && line[value.length() - 1] == '\r') {
-			value.erase(value.size() - 1, 1);
-		}
 		std::getline(clientRequest, line);
+		if (!line.empty() && line[line.length() - 1] == '\r') {
+			line.erase(line.size() - 1, 1);
+		}
 	}
 
 
@@ -135,9 +138,13 @@ void		Request::parsBody(std::istream & clientRequest){
 		_body = buffer;
 		return ;
 	}
+
 	//case of transfer encoding "chunked"
 	std::string line;
-	std::getline(clientRequest, line);	
+	while (clientRequest.eof() == false) {
+		std::getline(clientRequest, line);
+		_body += line + "\n";
+	}
 }
 
 void		Request::parsRequest(std::istream & clientRequest){
