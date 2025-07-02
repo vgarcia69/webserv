@@ -26,7 +26,8 @@
 	class Config
 	{
 		private:
-			std::vector<Server> m_servers;
+			ParsingState		m_state;
+			Server				m_servers;
 
 		public:
 			Config();

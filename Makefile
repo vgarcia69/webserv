@@ -6,13 +6,13 @@
 #    By: vgarcia <vgarcia@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/22 18:42:56 by vincentgarc       #+#    #+#              #
-#    Updated: 2025/06/30 13:12:12 by vgarcia          ###   ########.fr        #
+#    Updated: 2025/07/02 14:40:52 by vgarcia          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv 
 
-SRCFILE = main Config Server Location parsing
+SRCFILE = main Config Server Location parsing running
 SRCDIR= src/
 SRCFORMAT=.cpp
 SRCFILE := $(addprefix $(SRCDIR), $(SRCFILE))

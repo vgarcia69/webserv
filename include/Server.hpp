@@ -8,6 +8,8 @@
 	#include <sys/epoll.h>
 	#include <sys/socket.h>
 	#include <arpa/inet.h>
+	#include <fcntl.h>
+	#include <csignal>
 	#include "Location.hpp"
 
 	typedef std::map <std::string, std::string>	StringMap;
@@ -38,9 +40,18 @@
 			void	removeConnexion(int& fd, epoll_event& event);
 			void	handleClients(int& fd);
 
-			void	start();
-			void	run();
-			void	shutdown();
+			class SafeExit: public std::exception
+			{
+				public:
+					const char* what() const throw()
+					{
+						return "Shutting Down the Server";
+					}
+			};
+
+			void		start();
+			void		run();
+			static void	shut(int);
 	};
 
 #endif

@@ -2,28 +2,28 @@
 
 void	lookingFor(std::stringstream& content, std::string target, const char* errorMessage)
 {
-	std::string keyWord;
+	std::string keyword;
 
-	content >> keyWord;
-	if (keyWord != target)
+	content >> keyword;
+	if (keyword != target)
 		throw std::runtime_error(errorMessage);
 }
 
-void	ParsingServerInfo(std::stringstream& sequencedLine, ParsingState& state, Server& server)
+void	ParsingServerInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
 {
 	std::string			keyWord;
 	std::string			info;
 
-	sequencedLine >> keyWord;
+	sequenced_line >> keyWord;
 	if (keyWord == "location")
 	{
-		sequencedLine >> info;
+		sequenced_line >> info;
 		server.addLocation(info);
 		state = LOOKING_FOR_LOCATION_BLOCK;
 	}
 	else 
 	{
-		std::getline(sequencedLine, info, ';');
+		std::getline(sequenced_line, info, ';');
 		server.addInfo(keyWord, info);
 	}
 }
@@ -32,3 +32,8 @@ void	ParsingServerInfo(std::stringstream& sequencedLine, ParsingState& state, Se
 // {
 
 // }
+
+/*
+ajouter des spacing entre chaque chars specials comme ; { } , 
+puis reconvertir le tout en une stringstream big
+*/
