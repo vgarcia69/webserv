@@ -1,6 +1,8 @@
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
+#include "utils.hpp"
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -11,7 +13,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
-
+#include <functional>
 
 class Request {
 private :
@@ -20,20 +22,28 @@ private :
 	std::map<std::string, std::string>	_header;
 	std::string		_body;
 	std::string		_error;
-	static const std::set<std::string> _validMethods;
-
+	
 	void	parsFirstLine(std::istream & clientRequest);
 	void	parsHeader(std::istream & clientRequest);
 	void	parsBody(std::istream & clientRequest);
-
-public :
+	
+	void	handleError(){ std::cout << "handle Error" <<std::endl;}
+	void	handleGET(){ std::cout << "handle GET" <<std::endl;}
+	void	handlePOST(){ std::cout << "handle POST" <<std::endl;}
+	void	handleDELETE(){ std::cout << "handle DELETE" <<std::endl;}
+	
+	static const std::map<std::string, void (Request::*)()> _methodMap;
+	static std::map<std::string, void (Request::*)()> _createMethodMap();
+	
+	public :
 	Request();
 	~Request(){};
-
-
-	void		parsRequest(std::istream & clientRequest);
 	
-
+	
+	void		parsRequest(std::istream & clientRequest);
+	void		handleRequest();
+	
+	
 	//getter
 	const std::string& getMethod() const { return _method; }
 	const std::string& getURI() const { return _URI; }

@@ -1,6 +1,6 @@
 NAME = ./webserv
 
-FILES =	main.cpp Request.cpp utils.cpp
+FILES =	main.cpp Request.cpp utils.cpp processRequest.cpp
 
 OBJ_DIR = obj
 OBJ_FILES = $(addprefix $(OBJ_DIR)/, $(FILES:.cpp=.o))

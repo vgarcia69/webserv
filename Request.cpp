@@ -16,7 +16,7 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	_method = line.substr(0, space1);
 	
 
-	if (_validMethods.find(_method) == _validMethods.end()){
+	if (_methodMap.find(_method) == _methodMap.end()){
 		_error =  "405 – Method Not Allowed";
 		return ;
 	}
@@ -43,20 +43,21 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	std::string version = line.substr(space2);
 	if (version != "HTTP/1.1" && version != "HTTP/1.1\r")
 	{
-		_error="505 - HTTP Version Not Supported";
+		_error = "505 - HTTP Version Not Supported";
 		return ;
 	}
 }
 
 
-std::string	to_lower(std::string & input);
-
 void		Request::parsHeader(std::istream & clientRequest){
 	std::string	line;
 
 	std::getline(clientRequest, line);
-	if (!line.empty() && line[line.length() - 1] == '\r') {
-			line.erase(line.size() - 1, 1);
+	std::size_t	lenLine = line.length();
+	if (!line.empty() && line[lenLine - 1] == '\r') {
+			line.erase(lenLine - 1, 1);
+			--lenLine;
+			/*---------------------------------------------------------------------------------------ici faire une erreur?*/
 		}
 	while(line.empty() == false){
 		to_lower(line);
@@ -65,18 +66,24 @@ void		Request::parsHeader(std::istream & clientRequest){
 			return ;
 		}
 		size_t	posSep = line.find(':');
-		if (posSep == std::string::npos || posSep >= line.length() + 2){	//+2 for :	_header[key] = line.substr(posSep + 1);
+		if (posSep == std::string::npos || posSep >= lenLine + 2){	//+2 for :	_header[key] = line.substr(posSep + 1);
 			_error = "400 – Bad Request";
 			return ;
 		}
-		std::string value = line.substr(posSep + 1);
-		if (!value.empty() && value[0] == ' ') {
-			value.erase(0, 1);
+		if (line[posSep + 1] == ' ') {
+			line.erase(posSep, 1);
+			--lenLine;
 		}
-		_header[line.substr(0, posSep)] = value;
+		if (line[lenLine - 1] == ' ') {
+			line.erase(lenLine - 1, 1);
+			--lenLine;
+		}
+		_header[line.substr(0, posSep)] = line.substr(posSep + 1);
 		std::getline(clientRequest, line);
-		if (!line.empty() && line[line.length() - 1] == '\r') {
+		if (!line.empty() && line[lenLine - 1] == '\r') {
 			line.erase(line.size() - 1, 1);
+			--lenLine;
+			/*---------------------------------------------------------------------------------------ici faire une erreur?*/
 		}
 	}
 
@@ -104,6 +111,7 @@ void		Request::parsHeader(std::istream & clientRequest){
 			_error = "400 – Bad Request";
 			return ;
 		}
+		//case content-lenght + transfer encoding chunked
 		if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
 			_error = "400 – Bad Request";
 			return ;
@@ -130,11 +138,8 @@ void		Request::parsBody(std::istream & clientRequest){
 			return ;
 		}
 		char buffer[nb_char + 1];
-		clientRequest.read(buffer, nb_char + 1);
-		if (clientRequest.eof() == false){
-			_error = "400 – Bad Request";
-			return ;
-		}
+		clientRequest.read(buffer, nb_char);
+		buffer[nb_char] = '\0';
 		_body = buffer;
 		return ;
 	}
@@ -152,29 +157,28 @@ void		Request::parsRequest(std::istream & clientRequest){
 	parsFirstLine(clientRequest);
 	if (_error.empty() == false)
 		return ;
-	std::cout << "first line pass" <<std::endl;
+
 	parsHeader(clientRequest);
 	if (_error.empty() == false)
 		return ;
-	std::cout << "seconde line pass" <<std::endl;
 
 	parsBody(clientRequest);
 }
 
 std::ostream & operator<<(std::ostream &o, Request & request) {
 	o << "===== REQUEST INFO =====" << "\n";
-	if (request.getError().empty() == false){
-		o << request.getError();
-		o << "\n===================" << std::endl;
-		return o;
-	}
+	// if (request.getError().empty() == false){
+	// 	o << request.getError();
+	// 	o << "\n===================" << std::endl;
+	// 	return o;
+	// }
 	o << "Method: " << request.getMethod() << "\n";
 	o << "URI: " << request.getURI() << "\n";
 
 	o << "\n----- Headers -----" << "\n";
 	const std::map<std::string, std::string>& headers = request.getHeader();
 	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it) {
-		o << it->first << ": " << it->second << "\n";
+		o << it->first << ": " << it->second << "$\n";
 	}
 	if(request.getMethod() == "POST"){
 		o << "\n----- Body -----" << "\n";
@@ -186,12 +190,13 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 	return o;
 }
 
-std::set<std::string> creatValidMethode(void){
-	std::set<std::string> m;
-	m.insert("GET");
-	m.insert("POST");
-	m.insert("DELETE");
-	return m;
-};
 
-const std::set<std::string> Request::_validMethods = creatValidMethode();
+std::map<std::string, void (Request::*)()> Request::_createMethodMap() {
+    std::map<std::string, void (Request::*)()> m;
+    m["GET"]    = &Request::handleGET;
+    m["POST"]   = &Request::handlePOST;
+    m["DELETE"] = &Request::handleDELETE;
+    return m;
+}
+
+const std::map<std::string, void (Request::*)()> Request::_methodMap = Request::_createMethodMap();
