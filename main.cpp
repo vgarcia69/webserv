@@ -1,40 +1,41 @@
 #include "Request.hpp"
 #include <iostream>
 #include <fstream>
-#include <string>
+
+
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <request_file1> [request_file2 ...]" << std::endl;
-        return 1;
-    }
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << " <request_file1> [request_file2 ...]" << std::endl;
+		return 1;
+	}
 
-    // Parcourir tous les fichiers passés en argument
-    for (int i = 1; i < argc; i++) {
-        std::cout << "\nParsing file: " << argv[i] << std::endl;
-        std::cout << "----------------------------------------" << std::endl;
+	// Parcourir tous les fichiers passés en argument
+	for (int i = 1; i < argc; i++) {
+		std::cout << "\nParsing file: " << argv[i] << std::endl;
+		std::cout << "----------------------------------------" << std::endl;
 
-        // Ouvrir le fichier
-        std::ifstream file(argv[i]);
-        if (!file.is_open()) {
-            std::cerr << "Error: Cannot open file " << argv[i] << std::endl;
-            continue;
-        }
+		// Ouvrir le fichier
+		std::ifstream file(argv[i]);
+		if (!file.is_open()) {
+			std::cerr << "Error: Cannot open file " << argv[i] << std::endl;
+			continue;
+		}
 
-        // Créer et parser la requête
-        Request request;
-        request.parsRequest(file);
-        
-        // if (request.getError().empty())
-        std::cout << request;
-        // else
-        // std::cout << request.getError() << std::endl;
-        
-        file.close();
-        std::cout << "----------------------------------------\n" << std::endl;
-        request.handleRequest();
-        std::cout << "----------------------------------------\n" << std::endl;
-    }
+		// Créer et parser la requête
+		Request request;
+		request.parsRequest(file);
+		
+		// if (request.getError().empty())
+		std::cout << request;
+		// else
+		// std::cout << request.getError() << std::endl;
+		
+		file.close();
+		std::cout << "----------------------------------------\n" << std::endl;
+		request.handleRequest();
+		std::cout << "----------------------------------------\n" << std::endl;
+	}
 
-    return 0;
+	return 0;
 }

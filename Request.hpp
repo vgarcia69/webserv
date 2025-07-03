@@ -3,7 +3,7 @@
 
 #include "utils.hpp"
 
-#include <string>
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -14,6 +14,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <functional>
+
+#include <unistd.h>
 
 class Request {
 private :
@@ -27,10 +29,10 @@ private :
 	void	parsHeader(std::istream & clientRequest);
 	void	parsBody(std::istream & clientRequest);
 	
-	void	handleError(){ std::cout << "handle Error" <<std::endl;}
-	void	handleGET(){ std::cout << "handle GET" <<std::endl;}
-	void	handlePOST(){ std::cout << "handle POST" <<std::endl;}
-	void	handleDELETE(){ std::cout << "handle DELETE" <<std::endl;}
+	void	handleError();
+	void	handleGET();
+	void	handlePOST();
+	void	handleDELETE();
 	
 	static const std::map<std::string, void (Request::*)()> _methodMap;
 	static std::map<std::string, void (Request::*)()> _createMethodMap();

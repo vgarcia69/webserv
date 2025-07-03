@@ -1,9 +1,10 @@
 #ifndef UTILS_HPP
 # define UTILS_HPP
 
-#include "Request.hpp"
+
 #include <cctype>
 #include <string>
+
 
 class Request;
 

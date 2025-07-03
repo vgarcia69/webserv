@@ -4,6 +4,7 @@ ATTENTION :
 	- combinaison de methode ??
 	- RECOMMANDE d'avoir des lignes de 8000 octets
 	- faire la fonction pour savoir si c'est un CGI
+	- arreter a la premiere erreur ou continuer le parsing? Ecraser les erreurs ?
 
 
 

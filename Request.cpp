@@ -114,7 +114,6 @@ void		Request::parsHeader(std::istream & clientRequest){
 		//case content-lenght + transfer encoding chunked
 		if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
 			_error = "400 – Bad Request";
-			return ;
 		}
 	}
 }
