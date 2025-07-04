@@ -9,7 +9,7 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	std::string line;
 	std::getline(clientRequest, line);
 	if (line.empty()){
-		_error =  "400 – Bad Request";
+		_error =  ERROR_400;
 		return ;
 	}
 	size_t	space1 = line.find(' ');
@@ -17,12 +17,12 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	
 
 	if (_methodMap.find(_method) == _methodMap.end()){
-		_error =  "405 – Method Not Allowed";
+		_error = ERROR_405;
 		return ;
 	}
 
 	if (space1 == std::string::npos){
-		_error =  "400 – Bad Request";
+		_error =  ERROR_400;
 		return ;
 	}
 	++space1;
@@ -30,20 +30,24 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	_URI = line.substr(space1, space2 - space1);
 	
 	if (space2 == std::string::npos || _URI.empty()){
-		_error =  "400 – Bad Request";
+		_error =  ERROR_400;
 		return ;
 	}
 
 	++space2;
 	if(line.find(' ', space2) != std::string::npos){
-		_error =  "400 – Bad Request";
+		_error =  ERROR_400;
 		return ;
 	}
 
 	std::string version = line.substr(space2);
-	if (version != "HTTP/1.1" && version != "HTTP/1.1\r")
+	if (!version.empty() && version[version.length() - 1] != '\r') {
+		_error =  ERROR_400;
+		return ;
+	}
+	if (version != "HTTP/1.1\r")
 	{
-		_error = "505 - HTTP Version Not Supported";
+		_error = ERROR_505;
 		return ;
 	}
 }
@@ -62,16 +66,16 @@ void		Request::parsHeader(std::istream & clientRequest){
 	while(line.empty() == false){
 		to_lower(line);
 		if (clientRequest.eof()){
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 			return ;
 		}
 		size_t	posSep = line.find(':');
 		if (posSep == std::string::npos || posSep >= lenLine + 2){	//+2 for :	_header[key] = line.substr(posSep + 1);
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 			return ;
 		}
 		if (line[posSep + 1] == ' ') {
-			line.erase(posSep, 1);
+			line.erase(posSep + 1, 1);
 			--lenLine;
 		}
 		if (line[lenLine - 1] == ' ') {
@@ -80,8 +84,9 @@ void		Request::parsHeader(std::istream & clientRequest){
 		}
 		_header[line.substr(0, posSep)] = line.substr(posSep + 1);
 		std::getline(clientRequest, line);
+		lenLine = line.length();
 		if (!line.empty() && line[lenLine - 1] == '\r') {
-			line.erase(line.size() - 1, 1);
+			line.erase(line.size() - 1);
 			--lenLine;
 			/*---------------------------------------------------------------------------------------ici faire une erreur?*/
 		}
@@ -91,13 +96,13 @@ void		Request::parsHeader(std::istream & clientRequest){
 	//test the validity of the header
 
 	if (_header.find("host") == _header.end()) {
-		_error = "400 – Bad Request";
+		_error = ERROR_400;
 		return ;
 	}
 
 	if (_method == "POST"){
 		if (_header.find("content-type") == _header.end()){
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 			return ;
 		}
 		std::string	TransferEncoding;
@@ -108,12 +113,12 @@ void		Request::parsHeader(std::istream & clientRequest){
 		}
 		//case no content-lenght and no TransferEncoding "chunked"
 		if (_header.find("content-length") == _header.end() && TransferEncoding.empty()){
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 			return ;
 		}
 		//case content-lenght + transfer encoding chunked
 		if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 		}
 	}
 }
@@ -122,7 +127,7 @@ void		Request::parsHeader(std::istream & clientRequest){
 void		Request::parsBody(std::istream & clientRequest){
 	if (_method != "POST") {
 		if (clientRequest.eof() == false)
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 		return ;
 	}
 
@@ -133,7 +138,7 @@ void		Request::parsBody(std::istream & clientRequest){
 		size_t nb_char = strtol(_header["content-length"].c_str(), NULL, 10);
 		if (errno == ERANGE || nb_char < 0){
 			errno = 0;
-			_error = "400 – Bad Request";
+			_error = ERROR_400;
 			return ;
 		}
 		char buffer[nb_char + 1];
@@ -166,11 +171,11 @@ void		Request::parsRequest(std::istream & clientRequest){
 
 std::ostream & operator<<(std::ostream &o, Request & request) {
 	o << "===== REQUEST INFO =====" << "\n";
-	// if (request.getError().empty() == false){
-	// 	o << request.getError();
-	// 	o << "\n===================" << std::endl;
-	// 	return o;
-	// }
+	if (request.getError().empty() == false){
+		o << request.getError();
+		o << "\n===================" << std::endl;
+		return o;
+	}
 	o << "Method: " << request.getMethod() << "\n";
 	o << "URI: " << request.getURI() << "\n";
 

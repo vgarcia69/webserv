@@ -2,6 +2,7 @@
 # define REQUEST_HPP
 
 #include "utils.hpp"
+#include "defineError.hpp"
 
 
 #include <iostream>
@@ -25,6 +26,7 @@ private :
 	std::string		_body;
 	std::string		_error;
 	
+	void	processHeader(std::ostream & client);
 	void	parsFirstLine(std::istream & clientRequest);
 	void	parsHeader(std::istream & clientRequest);
 	void	parsBody(std::istream & clientRequest);

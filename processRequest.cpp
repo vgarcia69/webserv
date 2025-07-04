@@ -1,5 +1,6 @@
 #include "Request.hpp"
 #include "utils.hpp"
+#include <ctime>
 
 void Request::handleRequest(void) {
 	if (_error.empty() == false){
@@ -49,7 +50,39 @@ void Request::handleRequest(void) {
 	(this->*it->second)();
 }
 
+
+void	Request::processHeader(std::ostream & client){
+	
+	// Date: Wed, 21 Oct 2020 07:28:00 GMT
+	std::time_t timeUTC = std::time(0);
+	std::tm*	timeGMT = gmtime(&timeUTC);
+
+	char buffer[100];
+	std::strftime(buffer, sizeof(buffer), "Date: %a, %d %b %Y %H:%M:%S GMT\r", timeGMT);
+
+	client << buffer << std::endl;
+
+	//name
+	client << "LE NOM DU SERVEUR !!!!!!!!!!!!!!!!!!!\r" <<std::endl;
+
+	if (_error == ERROR_405){
+		client << "Allow:" ;
+		for (std::map<std::string, void(Request::*)()>::const_iterator it = _methodMap.begin(); it != _methodMap.end(); ++it){
+			client << " " << it->first;
+		}
+		client << "\r" << std::endl;
+	}
+
+	//client << "Connection: ";
+}
+
+// Autres header :
+// Content-Type: text/html; charset=utf-8
+// Content-Length: 5432 ou Transfer-Encoding: chunked
+
+
 void	Request::handleError(){
+	processHeader(std::cout);
 	std::cout << "handle Error" <<std::endl;
 }
 
