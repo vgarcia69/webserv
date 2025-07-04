@@ -1,96 +1,134 @@
 #include "Server.hpp"
 
+int	g_flag;
+
 void	Server::addConnexion(int& fd, epoll_event& event)
 {
-	// creer aussi une socket pour server_fd ?
+	Client		new_client;
+	sockaddr_in client_address;
+	socklen_t	address_size;
+
 	std::cout << "New Connexion Detected: " << fd << "." << std::endl;
-	epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, fd, &event);
-	int socket = accept(fd, NULL, NULL);
+
+	address_size = (socklen_t)sizeof(client_address);
+	int socket = accept(fd, (sockaddr *)&client_address, &address_size);
 	if (socket == -1)
 		throw std::runtime_error("New Socket Failed to Init");
 	
+	event.events = EPOLLIN | EPOLLRDHUP;
+	event.data.fd = socket;
+	epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, socket, &event);
+
 	int flags = fcntl(socket, F_GETFL);
 	if (flags == -1)
 		throw std::runtime_error("fcntl Failed");
 
-	flags |= O_NONBLOCK; // ajouter nonblock flag aux flags de la socket
+	flags |= O_NONBLOCK;
 
 	if (fcntl(socket, F_SETFL, flags) == -1)
 		throw std::runtime_error("fcntl Failed");
-	// ptet creer un client connecter a la socket. dans une map de clients ?
-	std::cout << "Client " << fd << " Added Successfully." << std::endl;
+	
+	char inet_str[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(client_address.sin_addr), inet_str, INET_ADDRSTRLEN);
+
+	new_client.setSocketFD(socket);
+	new_client.setIPAdress(inet_str);
+	m_clients.push_back(new_client);
+
+	std::cout << "Client " << socket << " Added Successfully." << std::endl;
+	std::cout << "Client IP Adress: " << new_client.getIPAdress() << std::endl;
 }
 
 void	Server::removeConnexion(int& fd, epoll_event& event)
 {
 	epoll_ctl(m_epoll_fd, EPOLL_CTL_DEL, fd, &event);
+	close(event.data.fd);
 	std::cout << "Removing Client: " << fd << "." << std::endl;
 }
 
-void	Server::handleClients(int& fd)
+void	Server::handleClients(int& client_fd, epoll_event& event)
 {
-	// ici on va cheque les request et les envoyés au parsing
-	std::cout << "Handling Client " << fd <<  " Request." << std::endl;
+	// partie de simeon ca pas touche !
+    char	buffer[1024];
+    int		bytes_read = read(client_fd, buffer, sizeof(buffer));
+	buffer[bytes_read] = 0;
+	if (bytes_read == -1)
+	{
+		std::cerr << "Error in Reading Client Request" << std::endl;
+		removeConnexion(client_fd, event);
+	}
+	else if (bytes_read == 0)
+    {
+        removeConnexion(client_fd, event);
+    }
+    else
+    {
+        std::cout << buffer << std::endl;
+    }
 }
 
-// epoll est set pour read les info de chaque socket, server_fd est setup pour l ecoute de nouvelles connexions
 void	Server::start()
 {
-	sockaddr_in	addr; // type pour injecter le port pour bind le server_fd
-	addr.sin_port = htons(m_port); // htons convert int16 host byte to int16 network byte
+	epoll_event	event;
+	sockaddr_in	addr;
+
+	addr.sin_port = htons(m_port);
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = INADDR_ANY;
 
 	m_epoll_fd = epoll_create1(0); 
-	m_server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (m_epoll_fd == -1)
+		throw std::runtime_error("Opening Epoll FD Failed");
 
+	m_server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_server_fd == -1)
 		throw std::runtime_error("Opening Server Socket Failed"); 
 
 	if (bind(m_server_fd, (sockaddr *)&addr, sizeof(addr)) == -1)
-		throw std::runtime_error("Binding Server Socket Failed"); 
+		throw std::runtime_error("Binding Server Socket Failed");
 
 	if (listen(m_server_fd, SOMAXCONN))
 		throw std::runtime_error("Listening Server Init Failed");
-	
+
+	g_flag = 0;
+	event.events = EPOLLIN;
+	event.data.fd = m_server_fd;
+	epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, m_server_fd, &event);
 }
 
 void	Server::run()
 {
-	int fd_num;
+	int			fd_num;
 	epoll_event	events[SOMAXCONN]; 
 	std::signal(SIGINT, shut);
 
-	addConnexion(m_server_fd, events[0]);
-	while (1)
+	while (!g_flag)
 	{
 		fd_num = epoll_wait(m_epoll_fd, events, SOMAXCONN, -1);
-		std::cout << "helloo" <<std::endl;
 		if (fd_num == -1)
 		{
 			std::cerr << "Poll Function Failed" << std::endl;
 		}
 		for (int i = 0; i < fd_num; i++)
 		{
-			if (events[i].data.fd == m_epoll_fd)
+			if (events[i].data.fd == m_server_fd)
 			{
 				addConnexion(events[i].data.fd, events[i]);
-				std::cout << "fd_num:" << fd_num << " et i: " << i << std::endl;
 			}
-			else if (events[i].events == EPOLLRDHUP)
+			else if (events[i].events & EPOLLRDHUP)
 			{
 				removeConnexion(events[i].data.fd, events[i]);
-				std::cout << "j attends quelque chose" << std::endl;
 			}
 			else
 			{
-				handleClients(events[i].data.fd);
-				std::cout << "je me cache ici" << std::endl;
+				handleClients(events[i].data.fd, events[i]);
 			}
 		}
-		std::cout << "j attends quelque chose" << std::endl;
 	}
 }
 
 void	Server::shut(int)
 {
-	throw SafeExit();
+	std::cout << "Shutting down the Server" << std::endl;
+	g_flag = 1;
 }

@@ -27,9 +27,13 @@ int main(int ac, char **av)
 	    server.start();
 	    server.run();
 	}
-	catch(...)
+	catch(std::exception &e)
 	{
-
+		std::cout << e.what();
+	}
+	catch (...)
+	{
+		std::cout << "ici ?" <<std::endl;
 	}
 
 	return 0;

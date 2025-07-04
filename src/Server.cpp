@@ -13,7 +13,11 @@ Server::Server()
 
 Server::~Server()
 {
+	for (unsigned i = 0; i < m_clients.size(); i++)
+		close(m_clients[i].getSocketFD());
 
+	close(m_epoll_fd);
+	close(m_server_fd);
 }
 
 void	Server::addLocation(std::string& root)
@@ -36,7 +40,7 @@ void	Server::addInfo(std::string keyword, std::string& info)
 	{
 		seqInfo >> info;
 		m_info[keyword] = info;
-		// if (seqInfo)
+		// if (seqInfo) a finir
 	}
 	else
 	{

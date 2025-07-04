@@ -11,6 +11,8 @@
 	#include <fcntl.h>
 	#include <csignal>
 	#include "Location.hpp"
+	#include <cstdlib>
+	#include "Client.hpp"
 
 	typedef std::map <std::string, std::string>	StringMap;
 	typedef std::pair<std::string, std::string> StringPair;
@@ -18,17 +20,20 @@
 	// std::string				serverName;
 	// std::string				ipAddress;       a voir ou les stockés ceux la
  	// std::string 				root;
+
 	class Server
 	{
 		private:
 			StringMap					m_info;	
 			std::vector<Location>		m_locations;
-    		std::vector<std::string>	m_errorPages;
+    		std::map<int, std::string>	m_errorPages;
+			std::vector<Client>			m_clients;
 			int							m_maxBodySize;
 
  			int							m_port;
 			int							m_epoll_fd;
 			int							m_server_fd;
+			epoll_event					m_events[SOMAXCONN]; 
 
 		public:
 			Server();			
@@ -38,7 +43,7 @@
 			void	addInfo(std::string keyword, std::string& info);
 			void	addConnexion(int& fd, epoll_event& event);
 			void	removeConnexion(int& fd, epoll_event& event);
-			void	handleClients(int& fd);
+			void	handleClients(int& fd, epoll_event& event);
 
 			class SafeExit: public std::exception
 			{
