@@ -25,29 +25,30 @@ private :
 	std::map<std::string, std::string>	_header;
 	std::string		_body;
 	std::string		_error;
-	
-	void	processHeader(std::ostream & client);
+	std::ostream &	_client;								//must be a iostram after
+
+	void	processHeader();
 	void	parsFirstLine(std::istream & clientRequest);
 	void	parsHeader(std::istream & clientRequest);
 	void	parsBody(std::istream & clientRequest);
-	
+
 	void	handleError();
 	void	handleGET();
 	void	handlePOST();
 	void	handleDELETE();
-	
+
 	static const std::map<std::string, void (Request::*)()> _methodMap;
 	static std::map<std::string, void (Request::*)()> _createMethodMap();
-	
+
 	public :
 	Request();
 	~Request(){};
-	
-	
+
+
 	void		parsRequest(std::istream & clientRequest);
 	void		handleRequest();
-	
-	
+
+
 	//getter
 	const std::string& getMethod() const { return _method; }
 	const std::string& getURI() const { return _URI; }

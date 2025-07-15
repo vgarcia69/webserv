@@ -2,7 +2,8 @@
 
 
 
-Request::Request(void){}
+Request::Request(void) : _client(std::cout)
+{}
 
 
 void		Request::parsFirstLine(std::istream & clientRequest) {
@@ -14,7 +15,7 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	}
 	size_t	space1 = line.find(' ');
 	_method = line.substr(0, space1);
-	
+
 
 	if (_methodMap.find(_method) == _methodMap.end()){
 		_error = ERROR_405;
@@ -28,7 +29,7 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	++space1;
 	size_t space2 = line.find(' ', space1);
 	_URI = line.substr(space1, space2 - space1);
-	
+
 	if (space2 == std::string::npos || _URI.empty()){
 		_error =  ERROR_400;
 		return ;
@@ -37,16 +38,7 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	++space2;
 	if(line.find(' ', space2) != std::string::npos){
 		_error =  ERROR_400;
-		return ;
-	}
-
-	std::string version = line.substr(space2);
-	if (!version.empty() && version[version.length() - 1] != '\r') {
-		_error =  ERROR_400;
-		return ;
-	}
-	if (version != "HTTP/1.1\r")
-	{
+	m["DELETE"]	= &Request::handleDELETE;
 		_error = ERROR_505;
 		return ;
 	}
@@ -135,7 +127,7 @@ void		Request::parsBody(std::istream & clientRequest){
 
 	//case of content-lenght:
 	if (_header.find("content-length") != _header.end()){
-		size_t nb_char = strtol(_header["content-length"].c_str(), NULL, 10);
+		long int nb_char = strtol(_header["content-length"].c_str(), NULL, 10);
 		if (errno == ERANGE || nb_char < 0){
 			errno = 0;
 			_error = ERROR_400;
@@ -148,16 +140,11 @@ void		Request::parsBody(std::istream & clientRequest){
 		return ;
 	}
 
-	//case of transfer encoding "chunked"
-	std::string line;
-	while (clientRequest.eof() == false) {
-		std::getline(clientRequest, line);
-		_body += line + "\n";
+	m["DELETE"]	= &Request::handleDELETE;
 	}
 }
 
 void		Request::parsRequest(std::istream & clientRequest){
-
 	parsFirstLine(clientRequest);
 	if (_error.empty() == false)
 		return ;
@@ -186,7 +173,7 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 	}
 	if(request.getMethod() == "POST"){
 		o << "\n----- Body -----" << "\n";
-		o << request.getBody() << "\n";	
+		o << request.getBody() << "\n";
 	}
 	else
 		o << "\n----- no body ------\n";
@@ -196,11 +183,11 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 
 
 std::map<std::string, void (Request::*)()> Request::_createMethodMap() {
-    std::map<std::string, void (Request::*)()> m;
-    m["GET"]    = &Request::handleGET;
-    m["POST"]   = &Request::handlePOST;
-    m["DELETE"] = &Request::handleDELETE;
-    return m;
+	std::map<std::string, void (Request::*)()> m;
+	m["GET"]	= &Request::handleGET;
+	m["POST"]	= &Request::handlePOST;
+	m["DELETE"]	= &Request::handleDELETE;
+	return m;
 }
 
 const std::map<std::string, void (Request::*)()> Request::_methodMap = Request::_createMethodMap();
