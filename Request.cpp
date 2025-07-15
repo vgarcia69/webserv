@@ -2,8 +2,7 @@
 
 
 
-Request::Request(void) : _client(std::cout)
-{}
+Request::Request(void): _client(std::cout){}
 
 
 void		Request::parsFirstLine(std::istream & clientRequest) {
@@ -38,7 +37,16 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 	++space2;
 	if(line.find(' ', space2) != std::string::npos){
 		_error =  ERROR_400;
-	m["DELETE"]	= &Request::handleDELETE;
+		return ;
+	}
+
+	std::string version = line.substr(space2);
+	if (!version.empty() && version[version.length() - 1] != '\r') {
+		_error =  ERROR_400;
+		return ;
+	}
+	if (version != "HTTP/1.1\r")
+	{
 		_error = ERROR_505;
 		return ;
 	}
@@ -118,8 +126,6 @@ void		Request::parsHeader(std::istream & clientRequest){
 
 void		Request::parsBody(std::istream & clientRequest){
 	if (_method != "POST") {
-		if (clientRequest.eof() == false)
-			_error = ERROR_400;
 		return ;
 	}
 
@@ -140,11 +146,16 @@ void		Request::parsBody(std::istream & clientRequest){
 		return ;
 	}
 
-	m["DELETE"]	= &Request::handleDELETE;
+	//case of transfer encoding "chunked"
+	std::string line;
+	while (clientRequest.eof() == false) {
+		std::getline(clientRequest, line);
+		_body += line + "\n";
 	}
 }
 
 void		Request::parsRequest(std::istream & clientRequest){
+
 	parsFirstLine(clientRequest);
 	if (_error.empty() == false)
 		return ;
@@ -183,11 +194,11 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 
 
 std::map<std::string, void (Request::*)()> Request::_createMethodMap() {
-	std::map<std::string, void (Request::*)()> m;
-	m["GET"]	= &Request::handleGET;
-	m["POST"]	= &Request::handlePOST;
-	m["DELETE"]	= &Request::handleDELETE;
-	return m;
+    std::map<std::string, void (Request::*)()> m;
+    m["GET"]    = &Request::handleGET;
+    m["POST"]   = &Request::handlePOST;
+    m["DELETE"] = &Request::handleDELETE;
+    return m;
 }
 
 const std::map<std::string, void (Request::*)()> Request::_methodMap = Request::_createMethodMap();

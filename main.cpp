@@ -25,16 +25,13 @@ int main(int argc, char *argv[]) {
 		// Créer et parser la requête
 		Request request;
 		request.parsRequest(file);
-		
-		// if (request.getError().empty())
+
 		std::cout << request;
-		// else
-		// std::cout << request.getError() << std::endl;
-		
+
 		file.close();
-		std::cout << "----------------------------------------\n" << std::endl;
+		std::cout << "before handle----------------------------------------\n" << std::endl;
 		request.handleRequest();
-		std::cout << "----------------------------------------\n" << std::endl;
+		std::cout << "end handle----------------------------------------\n" << std::endl;
 	}
 
 	return 0;

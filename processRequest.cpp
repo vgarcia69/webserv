@@ -4,7 +4,7 @@
 
 void Request::handleRequest(void) {
 	if (_error.empty() == false){
-		return handleError(std::cout);
+		return handleError();
 	}
 	if (isCGI(*this)){
 		int fd[2];

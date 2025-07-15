@@ -5,8 +5,8 @@ void to_lower(std::string & input) {
 		input[i] = std::tolower(static_cast<unsigned char>(input[i]));
 	}
 }
-	
+
 bool	isCGI(Request & request){
 	(void)request;
-	return true;
+	return false;
 }
