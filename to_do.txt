@@ -5,7 +5,7 @@ ATTENTION :
 	- RECOMMANDE d'avoir des lignes de 8000 octets
 	- faire la fonction pour savoir si c'est un CGI
 	- arreter a la premiere erreur ou continuer le parsing? Ecraser les erreurs ?
-
+	- faire une protection de pouvoir lire n'importe quoi?
 
 
 A FAIRE D'ARPES la norme HTTP :
@@ -30,16 +30,16 @@ https://www-rfc--editor-org.translate.goog/rfc/rfc9110?_x_tr_sl=auto&_x_tr_tl=fr
 Pas obligé de verifier le eof.
 2.2. Analyse des messages
 La procédure normale d'analyse d'un message HTTP consiste à lire la ligne de départ dans une structure, à lire chaque ligne
-d'en-tête dans une table de hachage par nom de champ jusqu'à la ligne vide, puis à utiliser les données analysées pour 
+d'en-tête dans une table de hachage par nom de champ jusqu'à la ligne vide, puis à utiliser les données analysées pour
 déterminer si un corps de message est attendu. Si un corps de message est indiqué, il est lu comme un flux jusqu'à ce qu'un
 nombre d'octets égal à la longueur du corps du message soit lu ou que la connexion soit fermée.
 
 
 
  - Tout usage de bibliothèque externe ou de l’ensemble Boost est interdit.
- - Fonction explicetement autorisé : execve, dup, dup2, pipe, strerror, gai_strerror, errno, dup, dup2, fork, socketpair 
+ - Fonction explicetement autorisé : execve, dup, dup2, pipe, strerror, gai_strerror, errno, dup, dup2, fork, socketpair
  htons, htonl, ntohs, ntohl, select, poll, epoll (epoll_create, epoll_ctl, epoll_wait), kqueue (kqueue, kevent), socket,
- accept, listen, send, recv, chdir bind, connect, getaddrinfo, freeaddrinfo, setsockopt, getsockname, getprotobyname, 
+ accept, listen, send, recv, chdir bind, connect, getaddrinfo, freeaddrinfo, setsockopt, getsockname, getprotobyname,
  fcntl, close, read, write, waitpid, kill, signal, access, stat, open, opendir, readdir and closedir.
 
 
@@ -61,24 +61,24 @@ Les règles principales suivantes sont incluses par référence, comme défini d
 
 - Faire des testes unitaires et le parsing des requettes HTTP
 
-- Classe Request 
+- Classe Request
 - Classe GET : public Request
 - Classe DELETE : public Request
 
 - Faire une classe mère avec un retour. et construire dessus des classes filles suivant le type de retour
 
 
-GET : 
+GET :
 Host
 
 
-POST : 
+POST :
 contentype et contentlen + body
 /*********************************************** boundary
 
 
 Codes Statut chercher si sous status
-	200 succès 
+	200 succès
 	300 redirection
 
 

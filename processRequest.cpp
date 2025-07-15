@@ -90,7 +90,26 @@ void	Request::handleError(){
 }
 
 void	Request::handleGET(){
-	_client << "handle GET" <<std::endl;
+	std::ifstream	file(_URI.c_str());
+	if (!file){
+		_client << "HTTP/1.1 " << ERROR_404 << "\r" << std::endl;
+		processHeader();
+		_client << "Content-Type: text/html; charset=UTF-8\r\n";
+		_client << "Content-Length: 1234\r\n";
+		_client << "<html>\r\n";
+		_client << "<head><title>404 Not Found</title></head>\r\n";
+		_client << "	<body>\r\n";
+		_client << "		<h1>404 Not Found</h1>\r\n";
+		_client << "		<p>La page demandée est introuvable.</p>\r\n";
+		_client << "	</body>\r\n";
+		_client << "</html>\r\n";
+		_client << "\r" << std::endl;
+		return ;
+	}
+	_client << "HTTP/1.1 200 OK\r" << std::endl;
+	processHeader();
+
+
 }
 
 void	Request::handlePOST(){
