@@ -15,7 +15,7 @@ Config::Config(const std::string &configFile, Server& currentServer)
 	if (!configIn.is_open())
 		throw std::runtime_error("Could not open the .conf file");
 
-	content << configIn.rdbuf();
+	setupContent(configIn, content);
 
 	while (1)
 	{

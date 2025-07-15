@@ -26,18 +26,19 @@
 	class Config
 	{
 		private:
-			ParsingState		m_state;
-			Server				m_servers;
+			ParsingState					m_state;
+			std::vector<Server>				m_servers;
 
 		public:
 			Config();
 			Config(const std::string& configFile, Server& servers);
 			~Config();
+			void	ParsingServerInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server);
+			void	parsingIPAddress(std::string& address);
+    		// void	ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);
 	};
 
-	void		lookingFor(std::stringstream& content, std::string target, const char* errorMessage);
-	void		lookingForBracket(std::stringstream& content);
-    void		ParsingServerInfo(std::stringstream& content, ParsingState& state, Server& server);
-    void		ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);
+	void	lookingFor(std::stringstream& content, std::string target, const char* errorMessage);
+	void	setupContent(std::fstream& configIn, std::stringstream& content);
 
 #endif

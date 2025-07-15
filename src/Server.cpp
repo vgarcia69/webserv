@@ -47,3 +47,8 @@ void	Server::addInfo(std::string keyword, std::string& info)
 		throw std::runtime_error("Invalid Argument in Configuration File");
 	}
 }
+
+std::string	Server::getInfo(std::string keyword)
+{
+	return m_info[keyword];
+}

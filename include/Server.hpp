@@ -31,6 +31,7 @@
 			int							m_maxBodySize;
 
  			int							m_port;
+			std::string					m_ipaddress;
 			int							m_epoll_fd;
 			int							m_server_fd;
 			epoll_event					m_events[SOMAXCONN]; 
@@ -39,11 +40,12 @@
 			Server();			
 			~Server();
 
-			void	addLocation(std::string& root);
-			void	addInfo(std::string keyword, std::string& info);
-			void	addConnexion(int& fd, epoll_event& event);
-			void	removeConnexion(int& fd, epoll_event& event);
-			void	handleClients(int& fd, epoll_event& event);
+			void		addLocation(std::string& root);
+			void		addInfo(std::string keyword, std::string& info);
+			void		addConnexion(int& fd, epoll_event& event);
+			void		removeConnexion(int& fd, epoll_event& event);
+			void		handleClients(int& fd, epoll_event& event);
+			std::string	getInfo(std::string keyword);
 
 			class SafeExit: public std::exception
 			{

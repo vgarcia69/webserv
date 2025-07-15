@@ -9,9 +9,7 @@ int main(int ac, char **av)
 		std::cerr << "Wrong Amount of Args" << std::endl;
 		return 1;
 	}
-
 	Server server;
-
 	// try
 	// {
 	// 	Config config(av[1], server);
@@ -22,19 +20,19 @@ int main(int ac, char **av)
 	// 	return 1;
 	// }
 
-	try
-	{
-	    server.start();
-	    server.run();
-	}
-	catch(std::exception &e)
-	{
-		std::cout << e.what();
-	}
-	catch (...)
-	{
-		std::cout << "ici ?" <<std::endl;
-	}
+	// try
+	// {
+	//     server.start();
+	//     server.run();
+	// }
+	// catch(std::exception &e)
+	// {
+	// 	std::cout << e.what();
+	// }
+	// catch (...)
+	// {
+	// 	std::cout << "ici ?" <<std::endl;
+	// }
 
 	return 0;
 }
