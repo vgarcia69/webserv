@@ -52,6 +52,11 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 	{
 		parseDefaultFile(info);
 	}
+	else if (keyword == "}")
+	{
+		state = GLOBAL;
+		return ;
+	}
 	sequenced_line >> keyword;
 	if (keyword != END_INSTRUC)
 		throw std::runtime_error("Instruction must be followed by a ;");
@@ -59,7 +64,22 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 
 void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
 {
+	std::string			keyword;
+	std::string			info;
 
+	sequenced_line >> keyword >> info;
+	if (keyword == ROOT)
+	{
+		checkRoot(info);
+	}
+	else if (keyword == "}")
+	{
+		state = SERVER_BLOCK;
+		return ;
+	}
+	sequenced_line >> keyword;
+	if (keyword != END_INSTRUC)
+		throw std::runtime_error("Instruction must be followed by a ;");
 }
 
 void	setupContent(std::fstream& configIn, std::stringstream& content)
