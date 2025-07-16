@@ -23,25 +23,27 @@ Config::Config(const std::string &configFile, Server& currentServer)
 		{
 			case GLOBAL:
 			{
-				lookingFor(content, "server", ERROR_SERVERBLOCK);
-				lookingFor(content, "{", ERROR_BRACKET);
+				if (!lookingFor(content, "server"))
+					break ;
+				if (!lookingFor(content, "{"))
+					throw std::runtime_error(ERROR_BRACKET);
 				//clear currentServer;
 				m_state = SERVER_BLOCK;
 			}
 			case SERVER_BLOCK:
 			{
-				ParsingServerInfo(content, m_state, currentServer);
+				parsingServerInfo(content, m_state, currentServer);
 				break ;
 			}
 			case LOOKING_FOR_LOCATION_BLOCK:
 			{
-				//clear currentLocation
-				// lookingForBracket(configIn, currentString);
+				if (!lookingFor(content, "{"))
+					throw std::runtime_error(ERROR_BRACKET);
 				m_state = LOCATION_BLOCK;
 			}
 			case LOCATION_BLOCK: // get line limited ;
 			{
-				// ParsingLocationInfo(configIn, currentString, m_state, currentServer);
+				parsingLocationInfo(content, m_state, currentServer);
 				break ;
 			}
 			default:

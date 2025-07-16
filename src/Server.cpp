@@ -4,11 +4,10 @@ Server::Server()
 {
 	// remplacer le vide par un default config, check si existant ou quoi
 	m_info.insert(m_info.end(), StringPair("server_name", "test"));
-	m_info.insert(m_info.end(), StringPair("ipAddress", "127.0.0.1"));
+	m_info.insert(m_info.end(), StringPair("host", "127.0.0.1"));
 	m_info.insert(m_info.end(), StringPair("port", "8001"));
 	m_info.insert(m_info.end(), StringPair("root", ""));
-	m_maxBodySize = 10;
-	m_port = 8001;
+	m_info.insert(m_info.end(), StringPair("client_max_body_size", "1024"));
 }
 
 Server::~Server()
@@ -28,7 +27,7 @@ void	Server::addLocation(std::string& root)
 	m_locations.push_back(new_loc);
 }
 
-void	Server::addInfo(std::string keyword, std::string& info)
+void	Server::addInfo(std::string keyword, std::string info)
 {
 	StringMap::iterator it = m_info.find(keyword);
 	std::stringstream	seqInfo;
@@ -50,5 +49,17 @@ void	Server::addInfo(std::string keyword, std::string& info)
 
 std::string	Server::getInfo(std::string keyword)
 {
-	return m_info[keyword];
+	if (m_info.count(keyword))
+		return m_info[keyword];
+	return NOT_FOUND;
+}
+
+void		Server::addErrorPage(int nbr, std::string path)
+{
+	m_errorPages[nbr] = path;
+}
+
+std::string	Server::getErrorPage(int nbr)
+{
+	return m_errorPages[nbr];
 }

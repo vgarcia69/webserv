@@ -1,47 +1,71 @@
 #include "Config.hpp"
 
-void	lookingFor(std::stringstream& content, std::string target, const char* errorMessage)
+bool	lookingFor(std::stringstream& content, std::string target)
 {
 	std::string keyword;
 
 	content >> keyword;
-	if (keyword != target)
-		throw std::runtime_error(errorMessage);
+	if (keyword == target)
+		return true;
+	return false;
 }
 
-void	Config::ParsingServerInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
+void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
 {
 	std::string			keyword;
 	std::string			info;
 
-	sequenced_line >> keyword;
+	sequenced_line >> keyword >> info;
 	if (keyword == "location")
 	{
-		sequenced_line >> info;
 		server.addLocation(info);
 		state = LOOKING_FOR_LOCATION_BLOCK;
+		return ;
 	}
-	else if (keyword == "listen")
+	else if (keyword == "host")
 	{
-		sequenced_line >> info;
 		parsingIPAddress(info);
 	}
-	else 
+	else if (keyword == PORT)
 	{
-		std::getline(sequenced_line, info, ';');
-		server.addInfo(keyword, info);
+		parsingPort(info);
 	}
+	else if (keyword == SERVER_NAME) //need to be added into /etc/hosts to work
+	{
+		parsingServerName(info);
+	}
+	else if (keyword == MAX_SIZE)
+	{
+		parsingMaxBodySize(info);
+	}
+	else if (keyword == ERROR_PAGE)
+	{
+		sequenced_line >> keyword;
+		parseErrorPage(info, keyword);
+	}
+	else if (keyword == ROOT)
+	{
+		checkRoot(info);
+		m_servers.back().addInfo(ROOT, info);
+	}
+	else if (keyword == DEFAULT_FILE)
+	{
+		parseDefaultFile(info);
+	}
+	sequenced_line >> keyword;
+	if (keyword != END_INSTRUC)
+		throw std::runtime_error("Instruction must be followed by a ;");
 }
 
-// void	Config::ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server)
-// {
+void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
+{
 
-// }
+}
 
 void	setupContent(std::fstream& configIn, std::stringstream& content)
 {
-	std::string			file;
-	size_t				pos = 0;
+	std::string	file;
+	size_t		pos = 0;
 
 	getline(configIn, file, '\0');
 	if (!file.length())
@@ -65,35 +89,5 @@ void	setupContent(std::fstream& configIn, std::stringstream& content)
 		}
 	}
 
-	std::cout << file <<std::endl;
 	content << file;
-}
-
-void	Config::parsingIPAddress(std::string& address)
-{
-	int			index = 0;
-	int			checker;
-	std::string	format = "XXX.XXX.XXX.XXX";
-	std::string buffer;
-
-	for (int i = 0; ((isdigit(address[i]) && format[i] == 'X') || format[i] == address[i]); i++)
-	{
-		if (format[i] == '.' || !format[i])
-		{
-			checker = std::atoi(buffer.c_str());
-			std::cout << checker << std::endl;
-			if (1 > checker || checker > 255)
-				throw std::runtime_error("Invalid IP Adress");
-			if (index == 3)
-			{
-				m_servers.back().addInfo("listen", address);
-				return ;
-			}
-			buffer.clear();
-			index++;
-			continue;
-		}
-		buffer += address[i];
-	}
-	throw std::runtime_error("invalid");
 }

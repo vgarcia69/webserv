@@ -84,9 +84,9 @@ void	Server::start()
 	epoll_event	event;
 	sockaddr_in	addr;
 
-	addr.sin_port = htons(m_port);
+	addr.sin_port = htons(std::atoi(getInfo(PORT).c_str()));
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = string_to_int(this->getInfo("listen"));
+	addr.sin_addr.s_addr = string_to_int(getInfo(HOST));
 
 	m_epoll_fd = epoll_create1(0);
 	if (m_epoll_fd == -1)
