@@ -5,9 +5,10 @@ Config::Config()
 	// find a default configuration ?
 }
 
-Config::Config(const std::string &configFile, Server& currentServer)
+Config::Config(const std::string &configFile)
 {
 	m_state = GLOBAL;
+	Server				current_server;
 	std::stringstream	content;
 	std::fstream		configIn;
 
@@ -23,16 +24,17 @@ Config::Config(const std::string &configFile, Server& currentServer)
 		{
 			case GLOBAL:
 			{
-				if (!lookingFor(content, "server"))
-					break ;
+				if (!lookingFor(content, "server") && m_servers.size())
+					return ;
 				if (!lookingFor(content, "{"))
 					throw std::runtime_error(ERROR_BRACKET);
+				m_servers.push_back(current_server);
 				//clear currentServer;
 				m_state = SERVER_BLOCK;
 			}
 			case SERVER_BLOCK:
 			{
-				parsingServerInfo(content, m_state, currentServer);
+				parsingServerInfo(content, m_state);
 				break ;
 			}
 			case LOOKING_FOR_LOCATION_BLOCK:
@@ -43,7 +45,7 @@ Config::Config(const std::string &configFile, Server& currentServer)
 			}
 			case LOCATION_BLOCK: // get line limited ;
 			{
-				parsingLocationInfo(content, m_state, currentServer);
+				// parsingLocationInfo(content, m_state);
 				break ;
 			}
 			default:

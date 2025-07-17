@@ -3,11 +3,13 @@
 Server::Server()
 {
 	// remplacer le vide par un default config, check si existant ou quoi
-	m_info.insert(m_info.end(), StringPair("server_name", "test"));
-	m_info.insert(m_info.end(), StringPair("host", "127.0.0.1"));
-	m_info.insert(m_info.end(), StringPair("port", "8001"));
-	m_info.insert(m_info.end(), StringPair("root", ""));
-	m_info.insert(m_info.end(), StringPair("client_max_body_size", "1024"));
+	// m_info.insert(m_info.end(), StringPair("server_name", "test"));
+	// m_info.insert(m_info.end(), StringPair("host", "127.0.0.1"));
+	// m_info.insert(m_info.end(), StringPair("port", "8001"));
+	// m_info.insert(m_info.end(), StringPair("root", ""));
+	// m_info.insert(m_info.end(), StringPair("client_max_body_size", "1024"));
+	m_epoll_fd = 0;
+	m_server_fd = 0;
 }
 
 Server::~Server()
@@ -23,28 +25,27 @@ void	Server::addLocation(std::string& root)
 {
 	Location new_loc;
 
-	new_loc.addInfo("root", root);
+	new_loc.addInfo(ROOT, root);
 	m_locations.push_back(new_loc);
 }
 
 void	Server::addInfo(std::string keyword, std::string info)
 {
-	StringMap::iterator it = m_info.find(keyword);
-	std::stringstream	seqInfo;
+	// StringMap::iterator it = m_info.find(keyword);
 
-	seqInfo << info;
-	info.clear();
-
-	if (it != m_info.end())
-	{
-		seqInfo >> info;
-		m_info[keyword] = info;
-		// if (seqInfo) a finir
-	}
-	else
-	{
-		throw std::runtime_error("Invalid Argument in Configuration File");
-	}
+	std::cout << "adding info: "<< keyword << " " << info << std::endl;
+	m_info[keyword] = info;
+	// if (it == m_info.end())
+	// {
+	// 	std::cout << "adding info: "<< keyword << " " << info << std::endl;
+	// 	m_info[keyword] = info;
+	// }
+	// else
+	// {
+	// 	std::cout << "info: " << m_info[keyword] << std::endl;
+	// 	std::cout << "new info: "<< keyword << " " << info << std::endl;
+	// 	throw std::runtime_error("Argument Already Set up");
+	// }
 }
 
 std::string	Server::getInfo(std::string keyword)
@@ -62,4 +63,14 @@ void		Server::addErrorPage(int nbr, std::string path)
 std::string	Server::getErrorPage(int nbr)
 {
 	return m_errorPages[nbr];
+}
+
+void	Server::addLocationInfo(std::string keyword, std::string info)
+{
+	m_locations.back().addInfo(keyword, info);
+}
+
+std::string	Server::getLocationInfo(std::string keyword)
+{
+	return m_locations.back().getInfo(keyword);
 }

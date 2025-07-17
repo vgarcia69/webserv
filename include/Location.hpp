@@ -5,6 +5,7 @@
 	#include <string>
 	#include <iostream>
 	#include <map>
+	#include "define.hpp"
 
 	typedef std::map<std::string, std::string>	StringMap;
 	typedef std::pair<std::string, std::string> StringPair;
@@ -13,15 +14,14 @@
 	{
 		private:
 			StringMap					m_info;	
-			std::vector<std::string>	m_indexes;
 			StringPair					m_cgi;
 
 		public:
 			Location();			
 			~Location();
-			void	addInfo(std::string keyword, std::string& info);
-			void	addIndex(std::string& info);
-			void	addCGI(std::string& suffix, std::string& info);
+			void		addInfo(std::string keyword, std::string info);
+			std::string	getInfo(std::string keyword);
+			void		addCGI(std::string& suffix, std::string& info);
 	};
 
 

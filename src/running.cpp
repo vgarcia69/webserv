@@ -67,7 +67,7 @@ void	Server::handleClients(int& client_fd, epoll_event& event)
     }
 }
 
-static int string_to_int(std::string host)
+int string_to_int(std::string host)
 {
     unsigned int a, b, c, d;
     std::stringstream ss(host);
@@ -87,7 +87,6 @@ void	Server::start()
 	addr.sin_port = htons(std::atoi(getInfo(PORT).c_str()));
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = string_to_int(getInfo(HOST));
-
 	m_epoll_fd = epoll_create1(0);
 	if (m_epoll_fd == -1)
 		throw std::runtime_error("Opening Epoll FD Failed");

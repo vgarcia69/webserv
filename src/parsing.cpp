@@ -1,43 +1,33 @@
 #include "Config.hpp"
 
-bool	lookingFor(std::stringstream& content, std::string target)
-{
-	std::string keyword;
-
-	content >> keyword;
-	if (keyword == target)
-		return true;
-	return false;
-}
-
-void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
+void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state)
 {
 	std::string			keyword;
 	std::string			info;
 
-	sequenced_line >> keyword >> info;
-	if (keyword == "location")
+	sequenced_line >> keyword;
+	// if (keyword == LOCATION)
+	// {
+	// 	server.addLocation(info);
+	// 	state = LOOKING_FOR_LOCATION_BLOCK;
+	// 	return ;
+	// }
+	if (keyword == "}")
 	{
-		server.addLocation(info);
-		state = LOOKING_FOR_LOCATION_BLOCK;
+		state = GLOBAL;
 		return ;
 	}
-	else if (keyword == "host")
-	{
+	sequenced_line >> info;
+	if (keyword == HOST)
 		parsingIPAddress(info);
-	}
 	else if (keyword == PORT)
-	{
 		parsingPort(info);
-	}
 	else if (keyword == SERVER_NAME) //need to be added into /etc/hosts to work
-	{
 		parsingServerName(info);
-	}
 	else if (keyword == MAX_SIZE)
-	{
 		parsingMaxBodySize(info);
-	}
+	else if (keyword == DEFAULT_FILE)
+		parseDefaultFile(info);
 	else if (keyword == ERROR_PAGE)
 	{
 		sequenced_line >> keyword;
@@ -48,38 +38,20 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 		checkRoot(info);
 		m_servers.back().addInfo(ROOT, info);
 	}
-	else if (keyword == DEFAULT_FILE)
-	{
-		parseDefaultFile(info);
-	}
-	else if (keyword == "}")
-	{
-		state = GLOBAL;
-		return ;
-	}
+	
 	sequenced_line >> keyword;
 	if (keyword != END_INSTRUC)
 		throw std::runtime_error("Instruction must be followed by a ;");
 }
 
-void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server)
+bool	lookingFor(std::stringstream& content, std::string target)
 {
-	std::string			keyword;
-	std::string			info;
+	std::string keyword;
 
-	sequenced_line >> keyword >> info;
-	if (keyword == ROOT)
-	{
-		checkRoot(info);
-	}
-	else if (keyword == "}")
-	{
-		state = SERVER_BLOCK;
-		return ;
-	}
-	sequenced_line >> keyword;
-	if (keyword != END_INSTRUC)
-		throw std::runtime_error("Instruction must be followed by a ;");
+	content >> keyword;
+	if (keyword == target)
+		return true;
+	return false;
 }
 
 void	setupContent(std::fstream& configIn, std::stringstream& content)
@@ -104,10 +76,10 @@ void	setupContent(std::fstream& configIn, std::stringstream& content)
 		}
 		else
 		{
+			file.insert(pos + 1, " ");
 			file.insert(pos, " ");
 			pos++;
 		}
 	}
-
 	content << file;
 }

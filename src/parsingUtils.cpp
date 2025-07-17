@@ -1,31 +1,50 @@
 #include "Config.hpp"
 
-void	Config::parseDefaultFile(std::string& file)
+void	Config::parseDefaultFile(std::string& path)
 {
-	// get root info, et join root + index puis check permissions
 	std::string	root;
-	root = m_servers.back().getInfo(ROOT);
 
+	root = m_servers.back().getInfo(ROOT);
+	if (root == NOT_FOUND)
+	  	root.clear();
+	root += path;
+
+	// std::cout << YELLOW << root << RESET << std::endl;
+
+	if (access(root.c_str(), F_OK | R_OK))
+		throw std::runtime_error("Invalid Error File Path");
+	m_servers.back().addInfo(DEFAULT_FILE, root);
 }
 
-void	Config::parsingPort(std::string& port_str)
+void	Config::parsingPort(std::string& info)
 {
-	std::stringstream	ss(port_str);
+	std::string			port_str;
 	int					port;
+	size_t				index;
 	
+	index = info.find(":");
+	if (index != std::string::npos)
+	{
+		port_str = info.substr(index + 1);
+		info.erase(index);
+		parsingIPAddress(info);
+	}
+	else
+		port_str = info;
+
+	std::stringstream	ss(port_str);
 	ss >> port;
-	if (ss.fail() || !ss.eof() || port < 1 || port > 65535)
+
+	if (ss.fail() || !ss.eof() || port < 1 || port > 65535 || port_str.size() != 4)
 		throw std::runtime_error("Invalid Port Parsed");
 	else
 		m_servers.back().addInfo(PORT, port_str);
 }
 
-void	Config::parsingIPAddress(std::string& address)
+void	Config::parsingIPAddress(std::string address)
 {
-	int			index = 0;
-	int			checker;
-	std::string	format = "XXX.XXX.XXX.XXX";
 	std::string buffer;
+	int			checker;
 
 	if (address == "localhost")
 	{
@@ -33,13 +52,15 @@ void	Config::parsingIPAddress(std::string& address)
 		return ;
 	}
 
-	for (int i = 0; ((isdigit(address[i]) && format[i] == 'X') || format[i] == address[i]); i++)
+	// std::cout << YELLOW << address << RESET << std::endl;
+
+	for (unsigned i = 0, index = 0; isdigit(address[i]) || address[i] == '.' || !address[i]; i++)
 	{
-		if (format[i] == '.' || !format[i])
+		if (address[i] == '.' || !address[i])
 		{
 			checker = std::atoi(buffer.c_str());
-			if (1 > checker || checker > 255)
-				throw std::runtime_error("Invalid IP Address");
+			if (0 > checker || checker > 255)
+				throw std::runtime_error("Invalid IP Address number");
 			if (index == 3)
 			{
 				m_servers.back().addInfo(HOST, address);
@@ -51,6 +72,7 @@ void	Config::parsingIPAddress(std::string& address)
 		}
 		buffer += address[i];
 	}
+	std::cout << address << std::endl;
 	throw std::runtime_error("Invalid IP Address");
 }
 
@@ -88,7 +110,7 @@ void	Config::checkRoot(std::string& info)
 	if (info[0] == '/')
 		throw std::runtime_error("Action not permitted");
 
-	for (unsigned i = 0; i < info.size(); i++)
+	for (size_t i = 0; i < info.size(); i++)
 	{
 		i = info.find_first_of('.', i + 1);
 		if (i == std::string::npos)
@@ -106,14 +128,15 @@ void	Config::parseErrorPage(std::string& number_str, std::string& path)
 	std::string	full_path;
 	int			error_number = std::atoi(number_str.c_str());
 
-	if (number_str.size() != 3 || (error_number >= 400 && error_number <= 599))
+	// std::cout << YELLOW << number_str << "  " << path << RESET << std::endl;
+
+	if (number_str.size() != 3 || error_number < 400 || error_number > 599)
 		throw std::runtime_error("Invalid Error Page Number");
 
 	full_path = m_servers.back().getInfo(ROOT);
 	if (full_path == NOT_FOUND)
-		full_path = path;
-	else
-		full_path += path;
+		full_path.clear();
+	full_path += path;
 
 	if (access(full_path.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Error Page Path");

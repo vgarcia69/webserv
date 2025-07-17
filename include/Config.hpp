@@ -8,6 +8,7 @@
 	#include <cstdlib>
 	#include <sys/stat.h>
 	#include <map>
+	#include <sys/wait.h>
 	#include <sstream>
 	#include <unistd.h>
 	#include "Server.hpp"
@@ -27,21 +28,24 @@
 	{
 		private:
 			ParsingState					m_state;
-			std::vector<Server>				m_servers;
 
 		public:
 			Config();
-			Config(const std::string& configFile, Server& servers);
+			Config(const std::string& configFile);
 			~Config();
-			void	parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server);
-			void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state, Server& server);
-			void	parsingIPAddress(std::string& address);
+
+			std::vector<Server>				m_servers;
+			void	parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state);
+			// void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
+			void	parsingIPAddress(std::string address);
 			void	parsingPort(std::string& port);
 			void	parsingServerName(std::string& info);
 			void	parsingMaxBodySize(std::string& info);
 			void	parseDefaultFile(std::string& info);
 			void	checkRoot(std::string& info);
 			void	parseErrorPage(std::string& number, std::string& path);
+
+			void	parseLocDefaultFile(std::string& path);
     		// void	ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);
 	};
 

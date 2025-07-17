@@ -35,11 +35,13 @@
 			~Server();
 
 			void		addLocation(std::string& root);
+			void		addLocationInfo(std::string keyword, std::string info);
 			void		addInfo(std::string keyword, std::string info);
 			void		addErrorPage(int nbr, std::string path);
 			void		addConnexion(int& fd, epoll_event& event);
 			void		removeConnexion(int& fd, epoll_event& event);
 			void		handleClients(int& fd, epoll_event& event);
+			std::string	getLocationInfo(std::string keyword);
 			std::string	getInfo(std::string keyword);
 			std::string	getErrorPage(int nbr);
 

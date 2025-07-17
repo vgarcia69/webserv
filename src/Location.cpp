@@ -16,27 +16,30 @@ Location::~Location()
 
 }
 
-void	Location::addInfo(std::string keyword, std::string& info)
+void	Location::addInfo(std::string keyword, std::string info)
 {
-	StringMap::iterator it = m_info.find(keyword);
-	if (it != m_info.end())
-	{
-		m_info[keyword] = info;
-	}
-	else
-	{
-		throw std::runtime_error("Invalid Argument in Configuration File");
-	}
-}
+	// StringMap::iterator it = m_info.find(keyword);
 
-void	Location::addIndex(std::string& info)
-{
-	// check si la loc existe ?
-	m_indexes.push_back(info);
+	m_info[keyword] = info;
+	// if (it != m_info.end())
+	// {
+	// 	m_info[keyword] = info;
+	// }
+	// else
+	// {
+	// 	throw std::runtime_error("Invalid Argument in Configuration Location");
+	// }
 }
 
 void	Location::addCGI(std::string& suffix, std::string& info)
 {
 	m_cgi = StringPair(suffix, info);
 	// a voir ajouter une pair avec le keyword extension
+}
+
+std::string	Location::getInfo(std::string keyword)
+{
+	if (m_info.count(keyword))
+		return m_info[keyword];
+	return NOT_FOUND;
 }
