@@ -1,5 +1,0 @@
-GET /page-inexistante.html HTTP/1.1
-Host: www.exemple.com
-Connection: close
-
-

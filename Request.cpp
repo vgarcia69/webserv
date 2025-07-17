@@ -2,7 +2,7 @@
 
 
 
-Request::Request(void): _client(std::cout){}
+Request::Request(void): _HTTPreponse(""){}
 
 
 void		Request::parsFirstLine(std::istream & clientRequest) {
@@ -55,14 +55,16 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 
 void		Request::parsHeader(std::istream & clientRequest){
 	std::string	line;
-
+	
 	std::getline(clientRequest, line);
 	std::size_t	lenLine = line.length();
 	if (!line.empty() && line[lenLine - 1] == '\r') {
-			line.erase(lenLine - 1, 1);
-			--lenLine;
-			/*---------------------------------------------------------------------------------------ici faire une erreur?*/
-		}
+		line.erase(lenLine - 1, 1);
+		--lenLine;
+		/*---------------------------------------------------------------------------------------ici faire une erreur?*/
+	}
+	
+	std::cout<< "line = [" << line<< "]"<<std::endl;
 	while(line.empty() == false){
 		to_lower(line);
 		if (clientRequest.eof()){
@@ -172,7 +174,7 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 	if (request.getError().empty() == false){
 		o << request.getError();
 		o << "\n===================" << std::endl;
-		return o;
+		//return o;
 	}
 	o << "Method: " << request.getMethod() << "\n";
 	o << "URI: " << request.getURI() << "\n";

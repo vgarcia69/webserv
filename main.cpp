@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "\nParsing file: " << argv[i] << std::endl;
 		std::cout << "----------------------------------------" << std::endl;
 
-		// Ouvrir le fichier
+		// Ouvrir le fichier ----------------------------------------------ici la socket
 		std::ifstream file(argv[i]);
 		if (!file.is_open()) {
 			std::cerr << "Error: Cannot open file " << argv[i] << std::endl;
@@ -31,6 +31,8 @@ int main(int argc, char *argv[]) {
 		file.close();
 		std::cout << "before handle----------------------------------------\n" << std::endl;
 		request.handleRequest();
+		//--------------------------------------------------------ici envoyer dans la socket
+		std::cerr << request.getHTTPreponse();
 		std::cout << "end handle----------------------------------------\n" << std::endl;
 	}
 
