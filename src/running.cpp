@@ -95,6 +95,10 @@ void	Server::start()
 	if (m_server_fd == -1)
 		throw std::runtime_error("Opening Server Socket Failed"); 
 
+	// int reuse = 1;
+	// if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1)
+	// 	throw std::runtime_error("Server Socket Set Option Failed"); 
+    
 	if (bind(m_server_fd, (sockaddr *)&addr, sizeof(addr)) == -1)
 		throw std::runtime_error("Binding Server Socket Failed");
 
