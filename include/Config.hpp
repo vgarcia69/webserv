@@ -36,7 +36,7 @@
 
 			std::vector<Server>				m_servers;
 			void	parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state);
-			// void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
+			void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
 			void	parsingIPAddress(std::string address);
 			void	parsingPort(std::string& port);
 			void	parsingServerName(std::string& info);
@@ -44,6 +44,9 @@
 			void	parseDefaultFile(std::string& info);
 			void	checkRoot(std::string& info);
 			void	parseErrorPage(std::string& number, std::string& path);
+			void	parseMethods(std::stringstream& sequenced_line);
+			void	parseReturn(std::string info);
+			void	parseAutoIndex(std::string info);
 
 			void	parseLocDefaultFile(std::string& path);
     		// void	ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);

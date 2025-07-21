@@ -45,7 +45,7 @@ Config::Config(const std::string &configFile)
 			}
 			case LOCATION_BLOCK: // get line limited ;
 			{
-				// parsingLocationInfo(content, m_state);
+				parsingLocationInfo(content, m_state);
 				break ;
 			}
 			default:

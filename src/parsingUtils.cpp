@@ -35,7 +35,7 @@ void	Config::parsingPort(std::string& info)
 	std::stringstream	ss(port_str);
 	ss >> port;
 
-	if (ss.fail() || !ss.eof() || port < 1 || port > 65535 || port_str.size() != 4)
+	if (ss.fail() || port < 1 || port > 65535 || port_str.size() != 4)
 		throw std::runtime_error("Invalid Port Parsed");
 	else
 		m_servers.back().addInfo(PORT, port_str);

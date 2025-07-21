@@ -14,6 +14,7 @@ int main(int ac, char **av)
 	try
 	{
 		Config config(av[1]);
+
 		for (unsigned i = 0; i < config.m_servers.size(); i++)
 		{
 			runServer(config.m_servers[i]);

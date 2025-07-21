@@ -6,12 +6,21 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 	std::string			info;
 
 	sequenced_line >> keyword;
-	// if (keyword == LOCATION)
-	// {
-	// 	server.addLocation(info);
-	// 	state = LOOKING_FOR_LOCATION_BLOCK;
-	// 	return ;
-	// }
+	if (keyword == LOCATION)
+	{
+		sequenced_line >> info;
+		info.insert(0, 1, '.');
+		if (info[info.size() - 1] != '/')
+			info.insert(info.size(), 1, '/');
+		std::string root = m_servers.back().getInfo(ROOT);
+
+		if (root == NOT_FOUND)
+			root.clear();
+		root += info;
+		m_servers.back().addLocation(root);
+		state = LOOKING_FOR_LOCATION_BLOCK;
+		return ;
+	}
 	if (keyword == "}")
 	{
 		state = GLOBAL;
