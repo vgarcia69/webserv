@@ -1,0 +1,119 @@
+ATTENTION :
+	- Faire le parsing pour les requetes chunked !!!!!!!!!!!!!!!!
+	- n'accepter que les requetes avec retour chariot (voir la norm)
+	- combinaison de methode ??
+	- RECOMMANDE d'avoir des lignes de 8000 octets
+	- faire la fonction pour savoir si c'est un CGI
+	- arreter a la premiere erreur ou continuer le parsing? Ecraser les erreurs ?
+	- faire une protection de pouvoir lire n'importe quoi?
+
+
+A FAIRE D'ARPES la norme HTTP :
+Message
+	- Ligne separer par "\r\n"
+	- Pas obligatoire d'avoir une entête.
+	- Pas de lecture de la suite si pas attendu.
+	- Pas de '\r' en dehord du body : soit erreur soir remplacer comme un espace et interpréter comme tel
+	- Compter dasn la longueur du body le /r/n si il est necessaire
+	- Il n'est pas demandé de vérifier le eof. Lu jusqu'au nombre d'octets indiqué ou que la connexionsoit fermée.
+
+Reponse :
+	- Pareil que requetes sauf entête et l'algorithme de détermination de la longueur du corps du message ( section 6 : 2.1. Format du message lien clicable).
+
+
+Les differentes requettes:
+https://www-rfc--editor-org.translate.goog/rfc/rfc9110?_x_tr_sl=auto&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp#GET
+
+
+
+
+Pas obligé de verifier le eof.
+2.2. Analyse des messages
+La procédure normale d'analyse d'un message HTTP consiste à lire la ligne de départ dans une structure, à lire chaque ligne
+d'en-tête dans une table de hachage par nom de champ jusqu'à la ligne vide, puis à utiliser les données analysées pour
+déterminer si un corps de message est attendu. Si un corps de message est indiqué, il est lu comme un flux jusqu'à ce qu'un
+nombre d'octets égal à la longueur du corps du message soit lu ou que la connexion soit fermée.
+
+
+
+ - Tout usage de bibliothèque externe ou de l’ensemble Boost est interdit.
+ - Fonction explicetement autorisé : execve, dup, dup2, pipe, strerror, gai_strerror, errno, dup, dup2, fork, socketpair
+ htons, htonl, ntohs, ntohl, select, poll, epoll (epoll_create, epoll_ctl, epoll_wait), kqueue (kqueue, kevent), socket,
+ accept, listen, send, recv, chdir bind, connect, getaddrinfo, freeaddrinfo, setsockopt, getsockname, getprotobyname,
+ fcntl, close, read, write, waitpid, kill, signal, access, stat, open, opendir, readdir and closedir.
+
+
+
+
+Exemple de requete qui doit être refuser : GET /malicious HTTP/1.1\r\nX-Evil: \xC3\x0A\r\nHost: site.com\r\n\r\n
+
+
+
+
+
+Les règles principales suivantes sont incluses par référence, comme défini dans [ RFC5234 ], Annexe B.1 : ALPHA (lettres), CR (retour chariot),
+ CRLF (CR LF), CTL (contrôles), DIGIT (décimal 0-9), DQUOTE (guillemets doubles), HEXDIG (hexadécimal 0-9/AF/af), HTAB (tabulation horizontale),
+  LF (saut de ligne), OCTET (toute séquence de données de 8 bits), SP (espace) et VCHAR (tout caractère [ USASCII ] visible ).
+
+
+
+
+
+- Faire des testes unitaires et le parsing des requettes HTTP
+
+- Classe Request
+- Classe GET : public Request
+- Classe DELETE : public Request
+
+- Faire une classe mère avec un retour. et construire dessus des classes filles suivant le type de retour
+
+
+GET :
+Host
+
+
+POST :
+contentype et contentlen + body
+/*********************************************** boundary
+
+
+Codes Statut chercher si sous status
+	200 succès
+	300 redirection
+
+
+https://www-rfc--editor-org.translate.goog/rfc/rfc9110?_x_tr_sl=auto&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp#section-15.5.15
+
+Client Error Responses:
+
+	400 – Bad Request
+
+	403 – Forbidden
+
+	404 – Not Found
+
+	405 – Method Not Allowed
+
+	413 – Payload Too Large (if you enforce client_max_body_size)
+
+	414 – URI Too Long (414 URI trop long) (Le code d'état 414 (URI trop long) indique que le serveur refuse de traiter la requête car l'URI cible est trop long pour être interprété par le serveur. Cette situation rare ne se produit que lorsqu'un client a converti de manière incorrecte une requête POST en requête GET contenant des informations de requête trop longues, lorsqu'il est pris dans une boucle infinie de redirection (par exemple, un préfixe d'URI redirigé pointant vers son propre suffixe) ou lorsque le serveur est attaqué par un client tentant d'exploiter des failles de sécurité potentielles. )
+
+	415 - Types de Média non pris en charge
+
+	429 – Too Many Requests (optional, for bonus rate-limiting)
+
+
+Server Error Responses:
+
+
+	500 – Internal Server Error (for general/unknown server-side problems)
+
+	501 – Not Implemented (if method is unsupported)
+
+	502 – Bad Gateway (for CGI errors or upstream problems)
+
+	503 – Service Unavailable (e.g., if your server is overloaded)
+
+	504 – Gateway Timeout (optional, for CGI timeouts)
+
+	505 - HTTP Version Not Supported
