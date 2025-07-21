@@ -5,9 +5,19 @@
 Request::Request(void): _HTTPreponse(""){}
 
 
-void		Request::parsFirstLine(std::istream & clientRequest) {
+void		Request::parsFirstLine(std::string &clientRequest) {
 	std::string line;
-	std::getline(clientRequest, line);
+	size_t nextNewLine = clientRequest.find('\n');
+	if (nextNewLine == std::string::npos){
+		line = clientRequest;
+		clientRequest = "";
+	}
+	else {
+		line = clientRequest.substr(0, nextNewLine);
+		clientRequest = clientRequest.substr(nextNewLine);
+		if (clientRequest[0] == '\n')
+			line.erase(0,1);
+	}
 	if (line.empty()){
 		_error =  ERROR_400;
 		return ;
@@ -53,10 +63,19 @@ void		Request::parsFirstLine(std::istream & clientRequest) {
 }
 
 
-void		Request::parsHeader(std::istream & clientRequest){
-	std::string	line;
-	
-	std::getline(clientRequest, line);
+void		Request::parsHeader(std::string & clientRequest){
+	std::string line;
+	size_t nextNewLine = clientRequest.find('\n');
+	if (nextNewLine == std::string::npos){
+		line = clientRequest;
+		clientRequest = "";
+	}
+	else {
+		line = clientRequest.substr(0, nextNewLine);
+		clientRequest = clientRequest.substr(nextNewLine);
+		if (clientRequest[0] == '\n')
+			line.erase(0,1);
+	}
 	std::size_t	lenLine = line.length();
 	if (!line.empty() && line[lenLine - 1] == '\r') {
 		line.erase(lenLine - 1, 1);
@@ -67,10 +86,11 @@ void		Request::parsHeader(std::istream & clientRequest){
 	std::cout<< "line = [" << line<< "]"<<std::endl;
 	while(line.empty() == false){
 		to_lower(line);
-		if (clientRequest.eof()){
-			_error = ERROR_400;
-			return ;
-		}
+		//old version
+		// if (clientRequest.eof()){
+		// 	_error = ERROR_400;
+		// 	return ;
+		// }
 		size_t	posSep = line.find(':');
 		if (posSep == std::string::npos || posSep >= lenLine + 2){	//+2 for :	_header[key] = line.substr(posSep + 1);
 			_error = ERROR_400;
@@ -85,7 +105,20 @@ void		Request::parsHeader(std::istream & clientRequest){
 			--lenLine;
 		}
 		_header[line.substr(0, posSep)] = line.substr(posSep + 1);
-		std::getline(clientRequest, line);
+
+		//getline
+		nextNewLine = clientRequest.find('\n');
+		if (nextNewLine == std::string::npos){
+			line = clientRequest;
+			clientRequest = "";
+		}
+		else {
+			line = clientRequest.substr(0, nextNewLine);
+			clientRequest = clientRequest.substr(nextNewLine);
+			if (clientRequest[0] == '\n')
+				line.erase(0,1);
+		}
+		
 		lenLine = line.length();
 		if (!line.empty() && line[lenLine - 1] == '\r') {
 			line.erase(line.size() - 1);
@@ -126,7 +159,7 @@ void		Request::parsHeader(std::istream & clientRequest){
 }
 
 
-void		Request::parsBody(std::istream & clientRequest){
+void		Request::parsBody(std::string &clientRequest){
 	if (_method != "POST") {
 		return ;
 	}
@@ -141,22 +174,60 @@ void		Request::parsBody(std::istream & clientRequest){
 			_error = ERROR_400;
 			return ;
 		}
-		char buffer[nb_char + 1];
-		clientRequest.read(buffer, nb_char);
-		buffer[nb_char] = '\0';
-		_body = buffer;
+		//old version
+		// char buffer[nb_char + 1];
+		// clientRequest.read(buffer, nb_char);
+		// buffer[nb_char] = '\0';
+		
+		_body = clientRequest.substr(0, nb_char);
 		return ;
 	}
 
 	//case of transfer encoding "chunked"
-	std::string line;
-	while (clientRequest.eof() == false) {
-		std::getline(clientRequest, line);
-		_body += line + "\n";
-	}
+	// std::string line;
+	// while (clientRequest.eof() == false) {
+	// 	std::getline(clientRequest, line);
+	// 	_body += line + "\n";
+	// }
 }
 
-void		Request::parsRequest(std::istream & clientRequest){
+std::string readSocket(int socket_fd, size_t max_size = 0) {
+	std::string resultat;
+	const size_t BUFFER_SIZE = 4096;
+	std::vector<char> buffer(BUFFER_SIZE);
+	
+	while (true) {
+		ssize_t bytes_lus = read(socket_fd, buffer.data(), BUFFER_SIZE);
+		
+		if (bytes_lus < 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				// Socket non-bloquante, pas plus de données disponibles
+				break;
+			} else {
+				throw std::runtime_error("Erreur lors de la lecture de la socket: " + 
+									   std::string(strerror(errno)));
+			}
+		} else if (bytes_lus == 0) {
+			// Connexion fermée par le peer
+			break;
+		} else {
+			// Vérifier la limite de taille si spécifiée
+			if (max_size > 0 && resultat.size() + bytes_lus > max_size) {
+				size_t bytes_a_ajouter = max_size - resultat.size();
+				resultat.append(buffer.data(), bytes_a_ajouter);
+				break;
+			}
+			
+			resultat.append(buffer.data(), bytes_lus);
+		}
+	}
+	
+	return resultat;
+}
+
+void		Request::parsRequest(int &socket_fd){
+
+	std::string	clientRequest = readSocket(socket_fd);
 
 	parsFirstLine(clientRequest);
 	if (_error.empty() == false)
@@ -196,11 +267,11 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 
 
 std::map<std::string, void (Request::*)()> Request::_createMethodMap() {
-    std::map<std::string, void (Request::*)()> m;
-    m["GET"]    = &Request::handleGET;
-    m["POST"]   = &Request::handlePOST;
-    m["DELETE"] = &Request::handleDELETE;
-    return m;
+	std::map<std::string, void (Request::*)()> m;
+	m["GET"]    = &Request::handleGET;
+	m["POST"]   = &Request::handlePOST;
+	m["DELETE"] = &Request::handleDELETE;
+	return m;
 }
 
 const std::map<std::string, void (Request::*)()> Request::_methodMap = Request::_createMethodMap();

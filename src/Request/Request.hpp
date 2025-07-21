@@ -28,9 +28,9 @@ private :
 	std::ostringstream					_HTTPreponse;
 
 	void	processHeader();
-	void	parsFirstLine(std::istream & clientRequest);
-	void	parsHeader(std::istream & clientRequest);
-	void	parsBody(std::istream & clientRequest);
+	void	parsFirstLine(std::string & clientRequest);
+	void	parsHeader(std::string & clientRequest);
+	void	parsBody(std::string & clientRequest);
 
 	void	handleError();
 	void	handleGET();
@@ -45,7 +45,7 @@ public :
 	~Request(){};
 
 
-	void		parsRequest(std::istream & clientRequest);
+	void		parsRequest(int &fd);
 	void		handleRequest();
 
 
