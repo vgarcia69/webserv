@@ -41,18 +41,18 @@ void	Server::addConnexion(int& fd, epoll_event& event)
 
 	std::cout << "Client " << socket << " Added Successfully." << std::endl;
 	std::cout << "Client IP Adress: " << new_client.getIPAdress() << std::endl;
-	std::string message = "HELLOO";
-	std::stringstream response;
-	response << "HTTP/1.1 200 OK\r\n"
-			<< "Content-Type: text/plain\r\n"
-			<< "Content-Length: " << message.length() + 13 << "\r\n"
-			<< "Connection: close\r\n"
-			<< "\r\n"
-			<< message <<  std::endl;
+	// std::string message = "HELLOO";
+	// std::stringstream response;
+	// response << "HTTP/1.1 200 OK\r\n"
+	// 		<< "Content-Type: text/plain\r\n"
+	// 		<< "Content-Length: " << message.length() + 13 << "\r\n"
+	// 		<< "Connection: close\r\n"
+	// 		<< "\r\n"
+	// 		<< message <<  std::endl;
 
-	std::string response_str = response.str();
-	send(socket, response_str.c_str(), response_str.length(), 0);
-	std::cout << BLUE << response.str() << RESET << std::endl;
+	// std::string response_str = response.str();
+	// send(socket, response_str.c_str(), response_str.length(), 0);
+	// std::cout << BLUE << response.str() << RESET << std::endl;
 }
 
 void	Server::removeConnexion(int& fd, epoll_event& event)
@@ -69,11 +69,12 @@ void	Server::handleClients(int& client_fd, epoll_event& event)
 
 	(void)event;
 	request.parsRequest(client_fd);
+	// std::cout << request <<std::endl;
 	request.handleRequest();
 
-	std::string response = request.getHTTPreponse();
-	send(client_fd, response.c_str(), response.length(), 0);
-
+	std::string reponse = request.getHTTPreponse();
+	// std::cout << "reponse is :\n" << reponse << std::endl;
+	send(client_fd, reponse.c_str(), reponse.length(), 0);
 }
 
 int string_to_int(std::string host)
@@ -158,10 +159,12 @@ void	Server::run()
 	std::cout << YELLOW << "Closing file descriptors !" << RESET << std::endl;
 	close(m_server_fd);
 	close(m_epoll_fd);
+	exit(0);
 }
 
 void	Server::shut(int)
 {
 	std::cout << YELLOW << "Shutting down the Server" << RESET << std::endl;
+	exit(0);
 	g_flag = 1;
 }

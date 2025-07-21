@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Webserv 42</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    p {
+      font-size: 1.1rem;
+    }
+    button {
+      display: block;
+      margin: 2rem auto 0;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3498db;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bienvenue sur mon Webserv 42</h1>
+    <p>
+      Cette page HTML simple est utilisée pour tester le bon fonctionnement de mon serveur HTTP.
+      Elle inclut des styles CSS, un peu de JavaScript, et du contenu statique.
+    </p>
+    <button onclick="afficherMessage()">Clique ici</button>
+    <p id="message" style="text-align: center; margin-top: 1rem;"></p>
+    <footer>
+      &copy; 2025 - Projet Webserv de l'école 42
+    </footer>
+  </div>
+
+  <script>
+    function afficherMessage() {
+      document.getElementById("message").innerText = "Tout fonctionne parfaitement 🎉";
+    }
+  </script>
+</body>
+</html>

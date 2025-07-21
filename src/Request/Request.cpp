@@ -3,6 +3,7 @@
 Request::Request(void): _HTTPreponse(""){}
 
 void		Request::parsFirstLine(std::string &clientRequest) {
+	
 	std::string line;
 	size_t nextNewLine = clientRequest.find('\n');
 	if (nextNewLine == std::string::npos){
@@ -11,9 +12,8 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 	}
 	else {
 		line = clientRequest.substr(0, nextNewLine);
-		clientRequest = clientRequest.substr(nextNewLine);
-		if (clientRequest[0] == '\n')
-			line.erase(0,1);
+		if (clientRequest.length() > nextNewLine + 1)
+			clientRequest = clientRequest.substr(nextNewLine + 1);
 	}
 	if (line.empty()){
 		_error =  ERROR_400;
@@ -21,8 +21,6 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 	}
 	size_t	space1 = line.find(' ');
 	_method = line.substr(0, space1);
-
-
 	if (_methodMap.find(_method) == _methodMap.end()){
 		_error = ERROR_405;
 		return ;
@@ -35,6 +33,9 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 	++space1;
 	size_t space2 = line.find(' ', space1);
 	_URI = line.substr(space1, space2 - space1);
+	if (_URI[0] == '/'){
+		_URI.erase(0,1);
+	}
 
 	if (space2 == std::string::npos || _URI.empty()){
 		_error =  ERROR_400;
@@ -46,7 +47,6 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 		_error =  ERROR_400;
 		return ;
 	}
-
 	std::string version = line.substr(space2);
 	if (!version.empty() && version[version.length() - 1] != '\r') {
 		_error =  ERROR_400;
@@ -62,6 +62,8 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 
 void		Request::parsHeader(std::string & clientRequest){
 	std::string line;
+
+	//getline
 	size_t nextNewLine = clientRequest.find('\n');
 	if (nextNewLine == std::string::npos){
 		line = clientRequest;
@@ -69,9 +71,9 @@ void		Request::parsHeader(std::string & clientRequest){
 	}
 	else {
 		line = clientRequest.substr(0, nextNewLine);
-		clientRequest = clientRequest.substr(nextNewLine);
-		if (clientRequest[0] == '\n')
-			line.erase(0,1);
+		if (clientRequest.length() > nextNewLine + 1){
+			clientRequest = clientRequest.substr(nextNewLine + 1);
+		}
 	}
 	std::size_t	lenLine = line.length();
 	if (!line.empty() && line[lenLine - 1] == '\r') {
@@ -79,8 +81,7 @@ void		Request::parsHeader(std::string & clientRequest){
 		--lenLine;
 		/*---------------------------------------------------------------------------------------ici faire une erreur?*/
 	}
-	
-	std::cout<< "line = [" << line<< "]"<<std::endl;
+
 	while(line.empty() == false){
 		to_lower(line);
 		//old version
@@ -111,9 +112,8 @@ void		Request::parsHeader(std::string & clientRequest){
 		}
 		else {
 			line = clientRequest.substr(0, nextNewLine);
-			clientRequest = clientRequest.substr(nextNewLine);
-			if (clientRequest[0] == '\n')
-				line.erase(0,1);
+			if (clientRequest.length() > nextNewLine + 1)
+				clientRequest = clientRequest.substr(nextNewLine + 1);
 		}
 		
 		lenLine = line.length();
@@ -124,7 +124,6 @@ void		Request::parsHeader(std::string & clientRequest){
 		}
 	}
 
-
 	//test the validity of the header
 
 	if (_header.find("host") == _header.end()) {
@@ -133,10 +132,10 @@ void		Request::parsHeader(std::string & clientRequest){
 	}
 
 	if (_method == "POST"){
-		if (_header.find("content-type") == _header.end()){
-			_error = ERROR_400;
-			return ;
-		}
+		// if (_header.find("content-type") == _header.end()){
+		// 	_error = ERROR_400;
+		// 	return ;
+		// }
 		std::string	TransferEncoding;
 		if (_header.find("transfer-encoding") != _header.end()){
 			TransferEncoding = _header["transfer-encoding"];
@@ -226,15 +225,22 @@ void		Request::parsRequest(int &socket_fd){
 
 	std::string	clientRequest = readSocket(socket_fd);
 
+	// std::cout << "clientRequest :\n"<< clientRequest <<std::endl;
+
 	parsFirstLine(clientRequest);
 	if (_error.empty() == false)
 		return ;
 
+	// std::cout <<"first line ok"<<std::endl;
 	parsHeader(clientRequest);
 	if (_error.empty() == false)
 		return ;
-
+	// std::cout <<"header ok"<<std::endl;
 	parsBody(clientRequest);
+	// std::cout <<"body end"<<std::endl;
+	// if (_error.empty() == false)
+	// 	std::cout << "error = " << _error << std::endl;
+
 }
 
 std::ostream & operator<<(std::ostream &o, Request & request) {

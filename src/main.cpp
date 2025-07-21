@@ -1,7 +1,7 @@
 #include "Config.hpp"
 #include "Server.hpp"
 
-static void	runServer(Server& server);
+// static void	runServer(Server& server);
 
 int main(int ac, char **av)
 {
@@ -15,11 +15,13 @@ int main(int ac, char **av)
 	{
 		Config config(av[1]);
 
-		for (unsigned i = 0; i < config.m_servers.size(); i++)
-		{
-			runServer(config.m_servers[i]);
-		}
-		wait(NULL);
+		// for (unsigned i = 0; i < config.m_servers.size(); i++)
+		// {
+		// 	runServer(config.m_servers[i]);
+		// }
+		// wait(NULL);
+		config.m_servers[0].start();
+		config.m_servers[0].run();
 	}
 	catch (std::exception &e)
 	{
@@ -30,16 +32,16 @@ int main(int ac, char **av)
 	return 0;
 }
 
-static void	runServer(Server& server)
-{
-	int pid;
+// static void	runServer(Server& server)
+// {
+// 	int pid;
 
-	pid = fork();
-	if (pid == -1)
-		std::cerr << "something" << std::endl;
-	else if (!pid)
-	{
-		server.start();
-		server.run();
-	}
-}
+// 	pid = fork();
+// 	if (pid == -1)
+// 		std::cerr << "something" << std::endl;
+// 	else if (!pid)
+// 	{
+// 		server.start();
+// 		server.run();
+// 	}
+// }

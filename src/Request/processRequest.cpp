@@ -68,6 +68,7 @@ void	Request::processHeader(){
 	//-------------------------------------------------------------------------------------------------qu'est ce qu'on fait ?
 	// _HTTPreponse << "Connection: keep-alive\r\n";
 	// _HTTPreponse << "Keep-Alive: timeout=5, max=100\r\n";
+	
 }
 
 // Autres header :
@@ -108,19 +109,19 @@ void	Request::handleGET(){
 		_HTTPreponse <<  page;
 		return ;
 	}
+	
+	std::string page;
+	std::string line;
+	
+	while (std::getline(file, line)) {
+		page += line;
+		page += '\n';
+	}
+
 	_HTTPreponse <<  "HTTP/1.1 200 OK\r\n";
 	processHeader();
-	_HTTPreponse <<  "transfer-encoding: chunked\r\n";
-	_HTTPreponse <<  "\r"<<  std::endl;
-	std::string line = " ";
-	while (file.eof() == false){
-		std::getline(file, line);
-		if (line.empty())
-			continue ;
-		_HTTPreponse <<  std::hex <<  line.length() <<  "\r\n";
-		_HTTPreponse <<  line <<  "\r\n";
-	}
-	_HTTPreponse <<  "0\r\n\r\n";
+	_HTTPreponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
+	_HTTPreponse <<  page;
 }
 
 void	Request::handlePOST(){

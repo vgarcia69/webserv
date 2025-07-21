@@ -25,6 +25,7 @@
 	#define NOT_FOUND		"not_found"
 	#define END_INSTRUC 	";"
 
+	#define ERROR_000	"TEST"	//-------------DELETE
 	#define ERROR_400	"400 Bad Request"
 	#define ERROR_404	"404 File Not Find"
 	#define ERROR_405	"405 Method Not Allowed"
