@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int fd_global)
+Server::Server()
 {
 	// remplacer le vide par un default config, check si existant ou quoi
 	// m_info.insert(m_info.end(), StringPair("server_name", "test"));
@@ -11,7 +11,6 @@ Server::Server(int fd_global)
 
 	m_epoll_fd = 0;
 	m_server_fd = 0;
-	m_flag_fd = fd_global;
 }
 
 Server::~Server()

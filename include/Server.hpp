@@ -14,7 +14,6 @@
 	#include <cstdlib>
 	#include "Client.hpp"
 	#include "define.hpp"
-	#include <sys/mman.h>
 
 	typedef std::map <std::string, std::string>	StringMap;
 	typedef std::pair<std::string, std::string> StringPair;
@@ -29,11 +28,10 @@
 
 			int							m_epoll_fd;
 			int							m_server_fd;
-			int							m_flag_fd;
 			epoll_event					m_events[SOMAXCONN];
 
 		public:
-			Server(int fd_global);
+			Server();
 			~Server();
 
 			void		addLocation(std::string& root);

@@ -13,13 +13,12 @@ int main(int ac, char **av)
 
 	try
 	{
-		Config config(av[1]);
+		std::vector<Server> servers;
+		std::string test = "default.conf";
+		if (av[1] != NULL)
+			test = av[1];
+		Config config(test, servers);
 
-		for (unsigned i = 0; i < config.m_servers.size(); i++)
-		{
-			runServer(config.m_servers[i]);
-		}
-		wait(NULL);
 	}
 	catch (std::exception &e)
 	{

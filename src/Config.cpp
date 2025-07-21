@@ -1,19 +1,9 @@
 #include "Config.hpp"
 
-static setFlagFile()
+Config::Config(const std::string &configFile, std::vector<Server>& servers)
+:m_servers(servers)
 {
-	open("/flag", O_CREAT, O_)
-}
-
-Config::Config()
-{
-	// find a default configuration ?
-}
-
-Config::Config(const std::string &configFile)
-{
-	int					flag_fd = setFlagFile();
-	Server				current_server(flag_fd);
+	Server				current_server;
 	std::stringstream	content;
 	std::fstream		configIn;
 	m_state = GLOBAL;
