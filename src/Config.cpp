@@ -1,5 +1,10 @@
 #include "Config.hpp"
 
+static setFlagFile()
+{
+	open("/flag", O_CREAT, O_)
+}
+
 Config::Config()
 {
 	// find a default configuration ?
@@ -7,10 +12,11 @@ Config::Config()
 
 Config::Config(const std::string &configFile)
 {
-	m_state = GLOBAL;
-	Server				current_server;
+	int					flag_fd = setFlagFile();
+	Server				current_server(flag_fd);
 	std::stringstream	content;
 	std::fstream		configIn;
+	m_state = GLOBAL;
 
 	configIn.open(configFile.c_str(), std::ios::in);
 	if (!configIn.is_open())

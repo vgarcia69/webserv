@@ -173,9 +173,6 @@ void	Server::run()
 			}
 		}
 	}
-	std::cout << YELLOW << "Closing file descriptors !" << RESET << std::endl;
-	close(m_server_fd);
-	close(m_epoll_fd);
 }
 
 void	Server::shut(int)

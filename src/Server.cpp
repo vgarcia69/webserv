@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server()
+Server::Server(int fd_global)
 {
 	// remplacer le vide par un default config, check si existant ou quoi
 	// m_info.insert(m_info.end(), StringPair("server_name", "test"));
@@ -8,8 +8,10 @@ Server::Server()
 	// m_info.insert(m_info.end(), StringPair("port", "8001"));
 	// m_info.insert(m_info.end(), StringPair("root", ""));
 	// m_info.insert(m_info.end(), StringPair("client_max_body_size", "1024"));
+
 	m_epoll_fd = 0;
 	m_server_fd = 0;
+	m_flag_fd = fd_global;
 }
 
 Server::~Server()
@@ -33,7 +35,7 @@ void	Server::addInfo(std::string keyword, std::string info)
 {
 	// StringMap::iterator it = m_info.find(keyword);
 
-	std::cout << "adding info: "<< keyword << " " << info << std::endl;
+	std::cout << "adding: "<< keyword << " " << info << std::endl;
 	m_info[keyword] = info;
 	// if (it == m_info.end())
 	// {

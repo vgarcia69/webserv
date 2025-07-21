@@ -14,6 +14,7 @@
 	#include <cstdlib>
 	#include "Client.hpp"
 	#include "define.hpp"
+	#include <sys/mman.h>
 
 	typedef std::map <std::string, std::string>	StringMap;
 	typedef std::pair<std::string, std::string> StringPair;
@@ -28,10 +29,11 @@
 
 			int							m_epoll_fd;
 			int							m_server_fd;
+			int							m_flag_fd;
 			epoll_event					m_events[SOMAXCONN];
 
 		public:
-			Server();
+			Server(int fd_global);
 			~Server();
 
 			void		addLocation(std::string& root);
@@ -41,6 +43,7 @@
 			void		addConnexion(int& fd, epoll_event& event);
 			void		removeConnexion(int& fd, epoll_event& event);
 			void		handleClients(int& fd, epoll_event& event);
+			int			getFlagFD;
 			std::string	getLocationInfo(std::string keyword);
 			std::string	getInfo(std::string keyword);
 			std::string	getErrorPage(int nbr);
