@@ -117,3 +117,11 @@ Server Error Responses:
 	504 – Gateway Timeout (optional, for CGI timeouts)
 
 	505 - HTTP Version Not Supported
+
+
+
+
+
+
+
+removeConnexion(client_fd, event); A faire dans les request si y rien a read

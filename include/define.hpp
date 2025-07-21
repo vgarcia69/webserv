@@ -25,8 +25,10 @@
 	#define NOT_FOUND		"not_found"
 	#define END_INSTRUC 	";"
 
-
-
+	#define ERROR_400	"400 Bad Request"
+	#define ERROR_404	"404 File Not Find"
+	#define ERROR_405	"405 Method Not Allowed"
+	#define ERROR_505	"505 HTTP Version Not Supported"
 
 	#define BLACK   "\033[30m"
 	#define RED     "\033[31m"
@@ -37,4 +39,5 @@
 	#define CYAN    "\033[36m"
 	#define WHITE   "\033[37m"
 	#define RESET	"\033[0m"	
+
 #endif

@@ -1,9 +1,6 @@
 #include "Request.hpp"
 
-
-
 Request::Request(void): _HTTPreponse(""){}
-
 
 void		Request::parsFirstLine(std::string &clientRequest) {
 	std::string line;

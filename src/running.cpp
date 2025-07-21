@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "Request.hpp"
 
 int	g_flag;
 
@@ -63,35 +64,16 @@ void	Server::removeConnexion(int& fd, epoll_event& event)
 
 void	Server::handleClients(int& client_fd, epoll_event& event)
 {
-    char	buffer[1024];
-    int		bytes_read = read(client_fd, buffer, sizeof(buffer));
+    // removeConnexion(client_fd, event);
+	Request request;
 
-	buffer[bytes_read] = 0;
-	if (bytes_read == -1)
-	{
-		std::cerr << "Error in Reading Client Request" << std::endl;
-		removeConnexion(client_fd, event);
-	}
-	else if (bytes_read == 0)
-    {
-        removeConnexion(client_fd, event);
-    }
-    else
-    {
-		// server name dans la reponse maxsize aussi
-        std::cout << buffer << std::endl;
-		std::string message = "je fais un trux";
-		std::stringstream response;
-		response << "HTTP/1.1 200 OK\r\n"
-				<< "Content-Type: text/plain\r\n"
-				<< "Content-Length: " << message.length() + 13 << "\r\n"
-				<< "Connection: close\r\n"
-				<< "\r\n"
-				<< message << std::endl;
+	(void)event;
+	request.parsRequest(client_fd);
+	request.handleRequest();
 
-		std::string response_str = response.str();
-		send(client_fd, response_str.c_str(), response_str.length(), 0);
-    }
+	std::string response = request.getHTTPreponse();
+	send(client_fd, response.c_str(), response.length(), 0);
+
 }
 
 int string_to_int(std::string host)
