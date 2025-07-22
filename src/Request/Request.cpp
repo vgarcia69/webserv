@@ -33,7 +33,16 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 	++space1;
 	size_t space2 = line.find(' ', space1);
 	_URI = line.substr(space1, space2 - space1);
-	if (_URI[0] == '/'){
+	if (_URI.empty() == true){
+		_error =  ERROR_400;
+		_error += " No URI";
+		return ;
+	}
+	if (_URI == "/"){
+		//------------------------------------------------------------------------------------ici mettre la page par default
+		_URI = "pageParDefault.html";
+	}
+	else if (_URI[0] == '/'){
 		_URI.erase(0,1);
 	}
 
@@ -75,6 +84,7 @@ void		Request::parsHeader(std::string & clientRequest){
 			clientRequest = clientRequest.substr(nextNewLine + 1);
 		}
 	}
+
 	std::size_t	lenLine = line.length();
 	if (!line.empty() && line[lenLine - 1] == '\r') {
 		line.erase(lenLine - 1, 1);
@@ -132,25 +142,13 @@ void		Request::parsHeader(std::string & clientRequest){
 	}
 
 	if (_method == "POST"){
+		//checker si vraiment necessaire
 		// if (_header.find("content-type") == _header.end()){
 		// 	_error = ERROR_400;
 		// 	return ;
 		// }
-		std::string	TransferEncoding;
-		if (_header.find("transfer-encoding") != _header.end()){
-			TransferEncoding = _header["transfer-encoding"];
-			if (TransferEncoding != "chunked")
-				TransferEncoding = "";
-		}
-		//case no content-lenght and no TransferEncoding "chunked"
-		if (_header.find("content-length") == _header.end() && TransferEncoding.empty()){
-			_error = ERROR_400;
-			return ;
-		}
-		//case content-lenght + transfer encoding chunked
-		if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
-			_error = ERROR_400;
-		}
+
+
 	}
 }
 
@@ -161,6 +159,33 @@ void		Request::parsBody(std::string &clientRequest){
 	}
 
 	//case of POST method
+
+	//check body method
+	std::string	TransferEncoding;
+	if (_header.find("transfer-encoding") != _header.end()){
+		TransferEncoding = _header["transfer-encoding"];
+	}
+
+	//case no content-lenght and no TransferEncoding "chunked"
+	if (_header.find("content-length") == _header.end() && TransferEncoding.empty()){
+		_error = ERROR_411;
+		return ;
+	}
+
+	//case no content-lenght and TransferEncoding != "chunked" (not implement)
+	if (/*_header.find("content-length") == _header.end() && */TransferEncoding != "chunked"){
+		_error = ERROR_501;
+		_error = "415 Unsupported Media Type";
+		return ;
+	}
+
+	//case content-lenght + transfer encoding chunked
+	if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
+		_error = ERROR_400;
+		return ;
+	}
+
+
 
 	//case of content-lenght:
 	if (_header.find("content-length") != _header.end()){
@@ -180,13 +205,23 @@ void		Request::parsBody(std::string &clientRequest){
 	}
 
 	//case of transfer encoding "chunked"
-	// std::string line;
-	// while (clientRequest.eof() == false) {
-	// 	std::getline(clientRequest, line);
-	// 	_body += line + "\n";
-	// }
+	else if (TransferEncoding == "chunked"){
+		// std::string line;
+		// while (clientRequest.eof() == false) {
+		// 	std::getline(clientRequest, line);
+		// 	_body += line + "\n";
+		// }
+	}
+
+	//case of no information of body, consider is empty
+	else
+		return ;
+
+
 }
 
+
+//-----------------------------------------------------------------------------------------Faire ou revoir la focntion
 std::string readSocket(int socket_fd, size_t max_size = 0) {
 	std::string resultat;
 	const size_t BUFFER_SIZE = 4096;
@@ -200,8 +235,8 @@ std::string readSocket(int socket_fd, size_t max_size = 0) {
 				// Socket non-bloquante, pas plus de données disponibles
 				break;
 			} else {
-				throw std::runtime_error("Erreur lors de la lecture de la socket: " + 
-									   std::string(strerror(errno)));
+				//------------------------------------------------------------------------------------------------------------------------ Gérer le throw + mettre le message en anglais
+				throw std::runtime_error("Erreur lors de la lecture de la socket: " + std::string(strerror(errno)));
 			}
 		} else if (bytes_lus == 0) {
 			// Connexion fermée par le peer
@@ -211,7 +246,7 @@ std::string readSocket(int socket_fd, size_t max_size = 0) {
 			if (max_size > 0 && resultat.size() + bytes_lus > max_size) {
 				size_t bytes_a_ajouter = max_size - resultat.size();
 				resultat.append(buffer.data(), bytes_a_ajouter);
-				break;
+				return (ERROR_413);
 			}
 			
 			resultat.append(buffer.data(), bytes_lus);
@@ -224,6 +259,9 @@ std::string readSocket(int socket_fd, size_t max_size = 0) {
 void		Request::parsRequest(int &socket_fd){
 
 	std::string	clientRequest = readSocket(socket_fd);
+	if (clientRequest == ERROR_413){
+		return ;
+	}
 
 	// std::cout << "clientRequest :\n"<< clientRequest <<std::endl;
 

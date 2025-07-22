@@ -69,11 +69,11 @@ void	Server::handleClients(int& client_fd, epoll_event& event)
 
 	(void)event;
 	request.parsRequest(client_fd);
-	// std::cout << request <<std::endl;
+	std::cout << request <<std::endl;
 	request.handleRequest();
 
 	std::string reponse = request.getHTTPreponse();
-	// std::cout << "reponse is :\n" << reponse << std::endl;
+	std::cout << "reponse is :\n" << reponse << std::endl;
 	send(client_fd, reponse.c_str(), reponse.length(), 0);
 }
 

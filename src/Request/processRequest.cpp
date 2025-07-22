@@ -62,12 +62,19 @@ void	Request::processHeader(){
 
 	_HTTPreponse << buffer;
 
-	//name					----------------------------------------------------------------------------------------------------------mettre le vrai nom du server
+	//name					---------------------------------------------------------------------------------------------------------- mettre le vrai nom du server
 	_HTTPreponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
 
-	//-------------------------------------------------------------------------------------------------qu'est ce qu'on fait ?
-	// _HTTPreponse << "Connection: keep-alive\r\n";
-	// _HTTPreponse << "Keep-Alive: timeout=5, max=100\r\n";
+	if (_error == ERROR_413){
+		//------------------------------------------------------------------------------------------------- fermer la connexion
+		_HTTPreponse << "Connection: close\r\n";
+	}
+	else{
+		//------------------------------------------------------------------------------------------------- chercher les info du serveur;
+		;
+		// _HTTPreponse << "Connection: keep-alive\r\n";
+		// _HTTPreponse << "Keep-Alive: timeout=5, max=100\r\n";
+	}
 	
 }
 

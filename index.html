@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Webserv 42</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .nav {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav a:hover {
+            background: #0056b3;
+        }
+        p {
+            text-align: center;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Accueil - Webserv 42</h1>
+        <p>Bienvenue sur le serveur HTTP développé pour l'école 42.</p>
+        <p>Utilisez les liens ci-dessous pour tester les différentes méthodes HTTP.</p>
+        
+        <div class="nav">
+            <a href="upload.html">📤 Upload (POST)</a>
+            <a href="files.html">📁 Liste fichiers (GET)</a>
+            <a href="delete.html">🗑️ Supprimer (DELETE)</a>
+        </div>
+        
+        <p><em>Chaque page génère de vraies requêtes HTTP vers votre serveur.</em></p>
+    </div>
+</body>
+</html>

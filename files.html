@@ -1,0 +1,92 @@
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fichiers - Webserv 42</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .file-link {
+            display: block;
+            margin: 10px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+        }
+        .file-link:hover {
+            background: #e9ecef;
+        }
+        .refresh-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .refresh-btn:hover {
+            background: #138496;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Retour à l'accueil</a>
+        
+        <h1>📁 Liste des fichiers</h1>
+        <p>Cette page génère des requêtes <strong>GET</strong> pour afficher les fichiers.</p>
+        
+        <button class="refresh-btn" onclick="location.reload()">🔄 Actualiser la liste</button>
+        
+        <div id="files-list">
+            <h3>Fichiers disponibles :</h3>
+            <!-- Ces liens génèrent des requêtes GET vers chaque fichier -->
+            <a href="/files/document.txt" class="file-link">📄 document.txt</a>
+            <a href="/files/image.jpg" class="file-link">🖼️ image.jpg</a>
+            <a href="/files/script.js" class="file-link">📜 script.js</a>
+            <a href="/files/style.css" class="file-link">🎨 style.css</a>
+            
+            <p><em>Cliquez sur un fichier pour le télécharger (requête GET)</em></p>
+        </div>
+        
+        <div class="info">
+            <strong>Méthode HTTP utilisée :</strong> GET<br>
+            <strong>URL cibles :</strong> /files/[nom-du-fichier]<br>
+            <strong>Action :</strong> Téléchargement des fichiers
+        </div>
+    </div>
+</body>
+</html>

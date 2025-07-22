@@ -29,6 +29,9 @@
 	#define ERROR_400	"400 Bad Request"
 	#define ERROR_404	"404 File Not Find"
 	#define ERROR_405	"405 Method Not Allowed"
+	#define ERROR_411	"411 Length Required"
+	#define ERROR_413	"413 Content Too Large"
+	#define ERROR_501	"501 Not Implemented"
 	#define ERROR_505	"505 HTTP Version Not Supported"
 
 	#define BLACK   "\033[30m"

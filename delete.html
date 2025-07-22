@@ -1,72 +1,136 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Webserv 42</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-      margin: 0;
-      padding: 2rem;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background-color: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    p {
-      font-size: 1.1rem;
-    }
-    button {
-      display: block;
-      margin: 2rem auto 0;
-      padding: 0.8rem 2rem;
-      font-size: 1rem;
-      background-color: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #3498db;
-    }
-    footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #777;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer - Webserv 42</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+        .file-name {
+            font-weight: bold;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Bienvenue sur mon Webserv 42</h1>
-    <p>
-      Cette page HTML simple est utilisée pour tester le bon fonctionnement de mon serveur HTTP.
-      Elle inclut des styles CSS, un peu de JavaScript, et du contenu statique.
-    </p>
-    <button onclick="afficherMessage()">Clique ici</button>
-    <p id="message" style="text-align: center; margin-top: 1rem;"></p>
-    <footer>
-      &copy; 2025 - Projet Webserv de l'école 42
-    </footer>
-  </div>
+    <div class="container">
+        <a href="index.html" class="back-link">← Retour à l'accueil</a>
+        
+        <h1>🗑️ Supprimer des fichiers</h1>
+        <p>Cette page utilise des requêtes <strong>DELETE</strong> pour supprimer les fichiers.</p>
+        
+        <div class="warning">
+            ⚠️ <strong>Attention :</strong> La suppression est définitive !
+        </div>
+        
+        <div id="files-to-delete">
+            <h3>Fichiers disponibles :</h3>
+            
+            <div class="file-item">
+                <span class="file-name">📄 document.txt</span>
+                <button class="delete-btn" onclick="deleteFile('document.txt')">Supprimer</button>
+            </div>
+            
+            <div class="file-item">
+                <span class="file-name">🖼️ image.jpg</span>
+                <button class="delete-btn" onclick="deleteFile('image.jpg')">Supprimer</button>
+            </div>
+            
+            <div class="file-item">
+                <span class="file-name">📜 script.js</span>
+                <button class="delete-btn" onclick="deleteFile('script.js')">Supprimer</button>
+            </div>
+            
+            <div class="file-item">
+                <span class="file-name">🎨 style.css</span>
+                <button class="delete-btn" onclick="deleteFile('style.css')">Supprimer</button>
+            </div>
+        </div>
+        
+        <div class="info">
+            <strong>Méthode HTTP utilisée :</strong> DELETE<br>
+            <strong>URL cibles :</strong> /files/[nom-du-fichier]<br>
+            <strong>Action :</strong> Suppression des fichiers du serveur
+        </div>
+    </div>
 
-  <script>
-    function afficherMessage() {
-      document.getElementById("message").innerText = "Tout fonctionne parfaitement 🎉";
-    }
-  </script>
+    <script>
+        function deleteFile(filename) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer "${filename}" ?`)) {
+                // Requête DELETE vers votre serveur
+                fetch(`/files/${filename}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert(`✅ "${filename}" a été supprimé avec succès !`);
+                        location.reload(); // Recharger la page
+                    } else {
+                        alert(`❌ Erreur lors de la suppression de "${filename}"`);
+                    }
+                })
+                .catch(error => {
+                    alert(`❌ Erreur de réseau : ${error.message}`);
+                });
+            }
+        }
+    </script>
 </body>
 </html>
