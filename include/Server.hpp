@@ -25,10 +25,7 @@
 			std::vector<Location>		m_locations;
     		std::map<int, std::string>	m_errorPages;
 			std::vector<Client>			m_clients;
-
-			int							m_epoll_fd;
 			int							m_server_fd;
-			epoll_event					m_events[SOMAXCONN];
 
 		public:
 			Server();
@@ -38,13 +35,10 @@
 			void		addLocationInfo(std::string keyword, std::string info);
 			void		addInfo(std::string keyword, std::string info);
 			void		addErrorPage(int nbr, std::string path);
-			void		addConnexion(int& fd, epoll_event& event);
-			void		removeConnexion(int& fd, epoll_event& event);
-			void		handleClients(int& fd, epoll_event& event);
-			int			getFlagFD;
 			std::string	getLocationInfo(std::string keyword);
 			std::string	getInfo(std::string keyword);
 			std::string	getErrorPage(int nbr);
+			int			getServerFD();
 
 			class SafeExit: public std::exception
 			{
@@ -55,9 +49,14 @@
 					}
 			};
 
-			void		start();
-			void		run();
-			static void	shut(int);
+			static int	s_nb_servers_running;
+			static int	s_epoll_fd;
+
+			bool		init();
 	};
+
+    void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients);
+	void	removeConnexion(epoll_event& event, std::map<int, Client>& clients);
+    void	handleClients(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
 
 #endif

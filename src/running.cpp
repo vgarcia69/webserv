@@ -1,182 +1,69 @@
+#include "Config.hpp"
 #include "Server.hpp"
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-int	g_flag;
+int g_flag;
 
-void	Server::addConnexion(int& fd, epoll_event& event)
+void	startServers(std::vector<Server>& servers)
 {
-	Client		new_client;
-	sockaddr_in client_address;
-	socklen_t	address_size;
+	Server::s_epoll_fd = epoll_create1(0);
+	if (Server::s_epoll_fd == -1)
+		throw	std::runtime_error("Epoll create Failed");
 
-	std::cout << "New Connexion Detected: " << fd << "." << std::endl;
-
-	address_size = (socklen_t)sizeof(client_address);
-	int socket = accept(fd, (sockaddr *)&client_address, &address_size);
-	if (socket == -1)
-		throw std::runtime_error("New Socket Failed to Init");
-	
-	event.events = EPOLLIN | EPOLLRDHUP;
-	event.data.fd = socket;
-	epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, socket, &event);
-
-	int flags = fcntl(socket, F_GETFL);
-	if (flags == -1)
-		throw std::runtime_error("fcntl Failed");
-
-	flags |= O_NONBLOCK;
-
-	if (fcntl(socket, F_SETFL, flags) == -1)
-		throw std::runtime_error("fcntl Failed");
-	
-	char inet_str[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &(client_address.sin_addr), inet_str, INET_ADDRSTRLEN);
-
-	new_client.setSocketFD(socket);
-	new_client.setIPAdress(inet_str);
-	m_clients.push_back(new_client);
-
-	std::cout << "Client " << socket << " Added Successfully." << std::endl;
-	std::cout << "Client IP Adress: " << new_client.getIPAdress() << std::endl;
-	std::string message = "HELLOO";
-	std::stringstream response;
-	response << "HTTP/1.1 200 OK\r\n"
-			<< "Content-Type: text/plain\r\n"
-			<< "Content-Length: " << message.length() + 13 << "\r\n"
-			<< "Connection: close\r\n"
-			<< "\r\n"
-			<< message <<  std::endl;
-
-	std::string response_str = response.str();
-	send(socket, response_str.c_str(), response_str.length(), 0);
-	std::cout << BLUE << response.str() << RESET << std::endl;
-}
-
-void	Server::removeConnexion(int& fd, epoll_event& event)
-{
-	epoll_ctl(m_epoll_fd, EPOLL_CTL_DEL, fd, &event);
-	close(event.data.fd);
-	std::cout << "Removing Client: " << fd << "." << std::endl;
-}
-
-void	Server::handleClients(int& client_fd, epoll_event& event)
-{
-    char	buffer[1024];
-    int		bytes_read = read(client_fd, buffer, sizeof(buffer));
-
-	buffer[bytes_read] = 0;
-	if (bytes_read == -1)
+	for (unsigned i = 0; i < servers.size(); i++)
 	{
-		std::cerr << "Error in Reading Client Request" << std::endl;
-		removeConnexion(client_fd, event);
+		if (!servers[i].init())
+			Server::s_nb_servers_running++;
 	}
-	else if (bytes_read == 0)
-    {
-        removeConnexion(client_fd, event);
-    }
-    else
-    {
-		// server name dans la reponse maxsize aussi
-        std::cout << buffer << std::endl;
-		std::string message = "je fais un trux";
-		std::stringstream response;
-		response << "HTTP/1.1 200 OK\r\n"
-				<< "Content-Type: text/plain\r\n"
-				<< "Content-Length: " << message.length() + 13 << "\r\n"
-				<< "Connection: close\r\n"
-				<< "\r\n"
-				<< message << std::endl;
-
-		std::string response_str = response.str();
-		send(client_fd, response_str.c_str(), response_str.length(), 0);
-    }
-}
-
-int string_to_int(std::string host)
-{
-    unsigned int a, b, c, d;
-    std::stringstream ss(host);
-    char dot;
-
-    ss >> a >> dot >> b >> dot >> c >> dot >> d;
-    uint32_t ip = (a << 24) | (b << 16) | (c << 8) | d;
-
-    return (htonl(ip));
-}
-
-void	Server::start()
-{
-	epoll_event	event;
-	sockaddr_in	addr;
-
-	addr.sin_port = htons(std::atoi(getInfo(PORT).c_str()));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = string_to_int(getInfo(HOST));
-
-	m_epoll_fd = epoll_create1(0);
-	if (m_epoll_fd == -1)
-		throw std::runtime_error("Opening Epoll FD Failed");
-
-	m_server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (m_server_fd == -1)
-		throw std::runtime_error("Opening Server Socket Failed"); 
-
-	int reuse = 1;
-	if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)))
-		throw std::runtime_error("Server Socket Set Option Failed"); 
-
-	if (bind(m_server_fd, (struct sockaddr *)&addr, sizeof(addr)))
-	{
-		perror("Error ");
-		throw std::runtime_error("Binding Server Socket Failed");
-	}
-
-	if (listen(m_server_fd, SOMAXCONN))
-		throw std::runtime_error("Listening Server Init Failed");
-
+	if (!Server::s_nb_servers_running)
+		throw std::runtime_error("All the servers failed to start");
 	g_flag = 0;
-	event.events = EPOLLIN;
-	event.data.fd = m_server_fd;
-	epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, m_server_fd, &event);
 }
 
-void	Server::run()
+void	shut(int)
 {
-	int			fd_num;
+	std::cout << YELLOW << "Shutting down the Servers" << RESET << std::endl;
+	g_flag = 1;
+}
+
+static bool	isNewEntrance(int fd, std::vector<Server>& servers)
+{
+	for (unsigned i = 0; i < servers.size(); i++)
+	{
+		if (fd == servers[i].getServerFD())
+			return 1;
+	}
+	return 0;
+}
+
+void	runServers(std::vector<Server>& servers)
+{
 	epoll_event	events[SOMAXCONN];
+	std::map<int, Client> clients;
+	int			fd_num;
 	std::signal(SIGINT, shut);
 
 	while (!g_flag)
 	{
-		fd_num = epoll_wait(m_epoll_fd, events, SOMAXCONN, -1);
-		if (g_flag)
-			break ;
+		fd_num = epoll_wait(Server::s_epoll_fd, events, SOMAXCONN, -1);
 		if (fd_num == -1)
 		{
-			std::cerr << "Poll Function Failed" << std::endl;
+			std::cerr << "EPoll Function Cancelled" << std::endl;
 		}
 		for (int i = 0; i < fd_num; i++)
 		{
-			if (events[i].data.fd == m_server_fd)
+			if (isNewEntrance(events[i].data.fd, servers))
 			{
-				addConnexion(events[i].data.fd, events[i]);
+				addConnexion(events[i].data.fd, events[i], clients);
 			}
 			else if (events[i].events & EPOLLRDHUP)
 			{
-				removeConnexion(events[i].data.fd, events[i]);
+				std::cout << fd_num << std::endl;
+				removeConnexion(events[i], clients);
 			}
 			else
 			{
-				handleClients(events[i].data.fd, events[i]);
+				handleClients(events[i].data.fd, events[i], clients);
 			}
 		}
 	}
-}
-
-void	Server::shut(int)
-{
-	std::cout << YELLOW << "Shutting down the Server" << RESET << std::endl;
-	g_flag = 1;
 }
