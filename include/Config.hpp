@@ -30,11 +30,10 @@
 			ParsingState					m_state;
 
 		public:
-			Config();
-			Config(const std::string& configFile);
+			Config(const std::string& configFile, std::vector<Server>& servers);
 			~Config();
 
-			std::vector<Server>				m_servers;
+			std::vector<Server>&				m_servers;
 			void	parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state);
 			void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
 			void	parsingIPAddress(std::string address);
@@ -50,6 +49,7 @@
 
 			void	parseLocDefaultFile(std::string& path);
     		// void	ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);
+			void	startServers(void);
 	};
 
 	bool	lookingFor(std::stringstream& content, std::string target);

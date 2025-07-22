@@ -9,6 +9,7 @@
 			int			m_port;
 			int			m_socket_fd;
 			std::string m_ip_address;
+			std::string	m_requestContent;
 
 		public:
 		 	Client() {}
@@ -22,7 +23,6 @@
 			void		setPort(int);
 			void		setIPAdress(std::string);
 			void		setSocketFD(int);
-
 	};
 
 #endif

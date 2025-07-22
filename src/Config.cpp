@@ -1,16 +1,12 @@
 #include "Config.hpp"
 
-Config::Config()
+Config::Config(const std::string &configFile, std::vector<Server>& servers)
+:m_servers(servers)
 {
-	// find a default configuration ?
-}
-
-Config::Config(const std::string &configFile)
-{
-	m_state = GLOBAL;
 	Server				current_server;
 	std::stringstream	content;
 	std::fstream		configIn;
+	m_state = GLOBAL;
 
 	configIn.open(configFile.c_str(), std::ios::in);
 	if (!configIn.is_open())
