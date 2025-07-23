@@ -15,12 +15,12 @@ int main(int ac, char **av)
 	try
 	{
 		std::vector<Server> servers;
-		std::string			test = "default.conf";
+		std::string			config_file = "default.conf";
 
 		if (av[1] != NULL)
-			test = av[1];
+			config_file = av[1];
 
-		Config config(test, servers);
+		Config config(config_file, servers);
 
 		startServers(servers);
 		runServers(servers);
