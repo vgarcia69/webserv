@@ -32,6 +32,7 @@ void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState
 	if (keyword == "}")
 	{
 		state = SERVER_BLOCK;
+		m_servers.back().addLocation(m_currentLoc, m_currentLoc.m_root);
 		return ;
 	}
 	sequenced_line >> keyword;
@@ -43,7 +44,7 @@ void	Config::parseLocDefaultFile(std::string& path)
 {
 	std::string	root;
 
-	root = m_servers.back().getLocationInfo(ROOT);
+	root = m_servers.back().getLocationInfoOf(ROOT, m_currentLoc);
 	if (root == NOT_FOUND)
 	{
 	    root = m_servers.back().getInfo(ROOT);
@@ -54,7 +55,7 @@ void	Config::parseLocDefaultFile(std::string& path)
 
 	if (access(root.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Error Page Path");
-	m_servers.back().addLocationInfo(ROOT, root);
+	addLocationInfo(ROOT, root);
 }
 
 void	Config::parseMethods(std::stringstream& sequenced_line)
@@ -70,14 +71,14 @@ void	Config::parseMethods(std::stringstream& sequenced_line)
 				throw std::runtime_error("Invalid Syntax Method");
 			break ;
 		}
-		m_servers.back().addLocationInfo(keyword, keyword);
+		addLocationInfo(keyword, keyword);
 	}
 }
 
 void	Config::parseAutoIndex(std::string info)
 {
 	if (info == "on" || info == "off")
-		m_servers.back().addLocationInfo(AUTOINDEX, info);
+		addLocationInfo(AUTOINDEX, info);
 	else
 		throw std::runtime_error("Invalid Autoindex Syntax");
 }
@@ -86,7 +87,7 @@ void	Config::parseReturn(std::string info)
 {
 	std::string	root;
 
-	root = m_servers.back().getLocationInfo(ROOT);
+	root = m_servers.back().getLocationInfoOf(ROOT, m_currentLoc);
 	if (root == NOT_FOUND)
 	{
 	    root = m_servers.back().getInfo(ROOT);
@@ -94,8 +95,7 @@ void	Config::parseReturn(std::string info)
 	    	root.clear();
 	}
 	root += info;
-	std::cout << root << std::endl;
 	if (access(root.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Return Redirection");
-	m_servers.back().addLocationInfo(RETURN, root);
+	addLocationInfo(RETURN, root);
 }

@@ -25,7 +25,7 @@ Config::Config(const std::string &configFile, std::vector<Server>& servers)
 				if (!lookingFor(content, "{"))
 					throw std::runtime_error(ERROR_BRACKET);
 				m_servers.push_back(current_server);
-				//clear currentServer;
+				current_server.clear();
 				m_state = SERVER_BLOCK;
 			}
 			case SERVER_BLOCK:
@@ -39,7 +39,7 @@ Config::Config(const std::string &configFile, std::vector<Server>& servers)
 					throw std::runtime_error(ERROR_BRACKET);
 				m_state = LOCATION_BLOCK;
 			}
-			case LOCATION_BLOCK: // get line limited ;
+			case LOCATION_BLOCK:
 			{
 				parsingLocationInfo(content, m_state);
 				break ;
@@ -55,4 +55,10 @@ Config::Config(const std::string &configFile, std::vector<Server>& servers)
 Config::~Config()
 {
 
+}
+
+void	Config::addLocationInfo(std::string keyword, std::string info)
+{
+	std::cout << "Adding info " BLUE << keyword << " " << info << RESET << std::endl;
+	m_currentLoc.addInfo(keyword, info);
 }

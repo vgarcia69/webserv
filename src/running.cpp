@@ -37,9 +37,10 @@ static bool	isNewEntrance(int fd, std::vector<Server>& servers)
 
 void	runServers(std::vector<Server>& servers)
 {
-	epoll_event	events[SOMAXCONN];
-	std::map<int, Client> clients;
-	int			fd_num;
+	std::map<int, Client>	clients;
+	epoll_event				events[SOMAXCONN];
+	int						fd_num;
+
 	std::signal(SIGINT, shut);
 
 	while (!g_flag)
@@ -53,15 +54,17 @@ void	runServers(std::vector<Server>& servers)
 		{
 			if (isNewEntrance(events[i].data.fd, servers))
 			{
+				std::cout << YELLOW "Adding new client" RESET << std::endl;
 				addConnexion(events[i].data.fd, events[i], clients);
 			}
 			else if (events[i].events & EPOLLRDHUP)
 			{
-				std::cout << fd_num << std::endl;
+				std::cout << YELLOW "Removing client" RESET << std::endl;
 				removeConnexion(events[i], clients);
 			}
 			else
 			{
+				std::cout << YELLOW "Handle client Request" RESET << std::endl;
 				handleClients(events[i].data.fd, events[i], clients);
 			}
 		}

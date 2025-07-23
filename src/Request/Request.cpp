@@ -205,6 +205,7 @@ std::string readSocket(int socket_fd, size_t max_size = 0) {
 			}
 		} else if (bytes_lus == 0) {
 			// Connexion fermée par le peer
+			std::cout << YELLOW "hello" RESET << std::endl;
 			break;
 		} else {
 			// Vérifier la limite de taille si spécifiée

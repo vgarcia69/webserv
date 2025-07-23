@@ -28,6 +28,7 @@
 	{
 		private:
 			ParsingState					m_state;
+			Location						m_currentLoc;
 
 		public:
 			Config(const std::string& configFile, std::vector<Server>& servers);
@@ -46,10 +47,11 @@
 			void	parseMethods(std::stringstream& sequenced_line);
 			void	parseReturn(std::string info);
 			void	parseAutoIndex(std::string info);
+			void	extendWithRoot(std::string& path, bool isLocation);
+			void	addLocationInfo(std::string keyword, std::string info);
 
 			void	parseLocDefaultFile(std::string& path);
     		// void	ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);
-			void	startServers(void);
 	};
 
 	bool	lookingFor(std::stringstream& content, std::string target);

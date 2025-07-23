@@ -64,7 +64,7 @@ void	Request::processHeader(){
 
 	//name					----------------------------------------------------------------------------------------------------------mettre le vrai nom du server
 	_HTTPreponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
-
+	_HTTPreponse << "Connexion: close\r\n";
 	//-------------------------------------------------------------------------------------------------qu'est ce qu'on fait ?
 	// _HTTPreponse << "Connection: keep-alive\r\n";
 	// _HTTPreponse << "Keep-Alive: timeout=5, max=100\r\n";

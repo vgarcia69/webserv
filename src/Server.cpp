@@ -17,12 +17,9 @@ Server::~Server()
 	close(m_server_fd);
 }
 
-void	Server::addLocation(std::string& root)
+void	Server::addLocation(Location loc, std::string& root)
 {
-	Location new_loc;
-
-	new_loc.addInfo(ROOT, root);
-	m_locations.push_back(new_loc);
+	m_locations[root] = loc;
 }
 
 void	Server::addInfo(std::string keyword, std::string info)
@@ -48,14 +45,10 @@ std::string	Server::getErrorPage(int nbr)
 	return m_errorPages[nbr];
 }
 
-void	Server::addLocationInfo(std::string keyword, std::string info)
-{
-	m_locations.back().addInfo(keyword, info);
-}
 
-std::string	Server::getLocationInfo(std::string keyword)
+std::string	Server::getLocationInfoOf(std::string keyword, Location& location)
 {
-	return m_locations.back().getInfo(keyword);
+	return location.getInfo(keyword);
 }
 
 int			Server::getServerFD()
@@ -115,4 +108,13 @@ bool Server::init()
 	event.data.fd = m_server_fd;
 	epoll_ctl(s_epoll_fd, EPOLL_CTL_ADD, m_server_fd, &event);
 	return 0;
+}
+
+void		Server::clear()
+{
+	m_clients.clear();
+	m_errorPages.clear();
+	m_info.clear();
+	m_locations.clear();
+	m_server_fd = 0;
 }

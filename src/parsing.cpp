@@ -10,14 +10,14 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 	{
 		sequenced_line >> info;
 		info.insert(0, 1, '.');
-		if (info[info.size() - 1] != '/')
-			info.insert(info.size(), 1, '/');
 		std::string root = m_servers.back().getInfo(ROOT);
 
 		if (root == NOT_FOUND)
 			root.clear();
 		root += info;
-		m_servers.back().addLocation(root);
+		m_servers.back().addLocation(m_currentLoc, root);
+		std::cout << "Adding " GREEN << root << RESET << std::endl;
+		m_currentLoc.clear();
 		state = LOOKING_FOR_LOCATION_BLOCK;
 		return ;
 	}

@@ -47,7 +47,6 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 	clients[event.data.fd].~Client();
 }
 
-
 void    handleClients(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
 {
     // removeConnexion(client_fd, event);

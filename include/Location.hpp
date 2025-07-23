@@ -19,9 +19,13 @@
 		public:
 			Location();			
 			~Location();
+			
+			std::string					m_root;
+
 			void		addInfo(std::string keyword, std::string info);
 			std::string	getInfo(std::string keyword);
 			void		addCGI(std::string& suffix, std::string& info);
+			void		clear();
 	};
 
 

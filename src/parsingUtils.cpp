@@ -1,5 +1,15 @@
 #include "Config.hpp"
 
+// void	Config::extendWithRoot(std::string& path, bool isLocation)
+// {
+// 	std::string	root;
+
+// 	root = m_servers.back().getInfo(ROOT);
+// 	if (root == NOT_FOUND)
+// 	  	root.clear();
+// 	root += path;
+// }
+
 void	Config::parseDefaultFile(std::string& path)
 {
 	std::string	root;
