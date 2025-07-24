@@ -62,23 +62,23 @@ bool Client::readSocket(int socket_fd, size_t max_size = 0) {
 			break;
 		} else {
 			// Vérifier la limite de taille si spécifiée
-			if (max_size > 0 && m_proccesing_request.size() + bytes_lus > max_size) {
-				size_t bytes_a_ajouter = max_size - m_proccesing_request.size();
-				m_proccesing_request.append(buffer.data(), bytes_a_ajouter);
+			if (max_size > 0 && m_processing_request.size() + bytes_lus > max_size) {
+				size_t bytes_a_ajouter = max_size - m_processing_request.size();
+				m_processing_request.append(buffer.data(), bytes_a_ajouter);
 				break;
 			}
 			
-			m_proccesing_request.append(buffer.data(), bytes_lus);
+			m_processing_request.append(buffer.data(), bytes_lus);
 		}
 			
 	}
-	if (m_proccesing_request.find("\r\n\r\n") != std::string::npos)
+	if (m_processing_request.find("\r\n\r\n") != std::string::npos)
 		return true;
 	return false;
 }
 
 void			Client::clear()
 {
-	m_proccesing_request = "";
-	m_response = "";
+	m_processing_request.clear();
+	m_response.clear();
 }

@@ -48,7 +48,6 @@ void Request::handleRequest(void) {
 	}
 	std::map<std::string, void (Request::*)()>::const_iterator it = _methodMap.find(_method);
 	(this->*it->second)();
-	_response = _HTTPresponse.str();
 }
 
 void	Request::processHeader(){
