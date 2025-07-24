@@ -48,8 +48,8 @@ void Request::handleRequest(void) {
 	}
 	std::map<std::string, void (Request::*)()>::const_iterator it = _methodMap.find(_method);
 	(this->*it->second)();
+	_response = _HTTPresponse.str();
 }
-
 
 void	Request::processHeader(){
 
@@ -60,15 +60,14 @@ void	Request::processHeader(){
 	char buffer[100];
 	std::strftime(buffer, sizeof(buffer), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", timeGMT);
 
-	_HTTPreponse << buffer;
+	_HTTPresponse << buffer;
 
 	//name					---------------------------------------------------------------------------------------------------------- mettre le vrai nom du server
-	_HTTPreponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
-<<<<<<< HEAD
+	_HTTPresponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
 
 	if (_error == ERROR_413){
 		//------------------------------------------------------------------------------------------------- fermer la connexion
-		_HTTPreponse << "Connection: close\r\n";
+		_HTTPresponse << "Connection: close\r\n";
 	}
 	else{
 		//------------------------------------------------------------------------------------------------- chercher les info du serveur;
@@ -76,12 +75,6 @@ void	Request::processHeader(){
 		// _HTTPreponse << "Connection: keep-alive\r\n";
 		// _HTTPreponse << "Keep-Alive: timeout=5, max=100\r\n";
 	}
-=======
-	_HTTPreponse << "Connexion: close\r\n";
-	//-------------------------------------------------------------------------------------------------qu'est ce qu'on fait ?
-	// _HTTPreponse << "Connection: keep-alive\r\n";
-	// _HTTPreponse << "Keep-Alive: timeout=5, max=100\r\n";
->>>>>>> main
 	
 }
 
@@ -91,14 +84,14 @@ void	Request::processHeader(){
 
 
 void	Request::handleError(){
-	_HTTPreponse << "HTTP/1.1 " << _error << "\r\n";
+	_HTTPresponse << "HTTP/1.1 " << _error << "\r\n";
 	processHeader();
 	if (_error == ERROR_405){
-		_HTTPreponse << "Allow:" ;
+		_HTTPresponse << "Allow:" ;
 		for (std::map<std::string, void(Request::*)()>::const_iterator it = _methodMap.begin(); it != _methodMap.end(); ++it){
-			_HTTPreponse << " " << it->first;
+			_HTTPresponse << " " << it->first;
 		}
-		_HTTPreponse << "\r\n\r\n";
+		_HTTPresponse << "\r\n\r\n";
 	}
 	//-------------------------------------------------------------------------------------------si erreur 401 doit faire qqc de special.
 	std::cout << "handle Error/n";
@@ -107,9 +100,9 @@ void	Request::handleError(){
 void	Request::handleGET(){
 	std::ifstream	file(_URI.c_str());
 	if (!file){
-		_HTTPreponse << "HTTP/1.1 " << ERROR_404 <<  "\r\n";
+		_HTTPresponse << "HTTP/1.1 " << ERROR_404 <<  "\r\n";
 		processHeader();
-		_HTTPreponse <<  "Content-Type: text/html; charset=UTF-8\r\n";
+		_HTTPresponse <<  "Content-Type: text/html; charset=UTF-8\r\n";
 		std::string page;
 		page += "<html>\r\n";
 		page += "<head><title>404 Not Found</title></head>\r\n";
@@ -119,8 +112,8 @@ void	Request::handleGET(){
 		page += "	</body>\r\n";
 		page += "</html>\r\n";
 		page += "\r\n";
-		_HTTPreponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
-		_HTTPreponse <<  page;
+		_HTTPresponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
+		_HTTPresponse <<  page;
 		return ;
 	}
 	
@@ -132,16 +125,16 @@ void	Request::handleGET(){
 		page += '\n';
 	}
 
-	_HTTPreponse <<  "HTTP/1.1 200 OK\r\n";
+	_HTTPresponse <<  "HTTP/1.1 200 OK\r\n";
 	processHeader();
-	_HTTPreponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
-	_HTTPreponse <<  page;
+	_HTTPresponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
+	_HTTPresponse <<  page;
 }
 
 void	Request::handlePOST(){
-	_HTTPreponse <<  "handle POST\n";
+	_HTTPresponse <<  "handle POST\n";
 }
 
 void	Request::handleDELETE(){
-	_HTTPreponse <<  "handle DELETE\n";
+	_HTTPresponse <<  "handle DELETE\n";
 }

@@ -17,14 +17,14 @@
 
 #include <unistd.h>
 
-class Request {
+class Request{
 private :
 	std::string							_method;
 	std::string							_URI;					// URI : Uniform Resource Identifier
 	std::map<std::string, std::string>	_header;
 	std::string							_body;
 	std::string							_error;
-	std::ostringstream					_HTTPreponse;
+	std::ostringstream					_HTTPresponse;
 
 	void	processHeader();
 	void	parsFirstLine(std::string & clientRequest);
@@ -39,11 +39,14 @@ private :
 	static const std::map<std::string, void (Request::*)()> _methodMap;
 	static std::map<std::string, void (Request::*)()> _createMethodMap();
 
+protected :
+	std::string							_response;
+
 public :
 	Request();
 	~Request(){};
 
-	void		parsRequest(int &fd);
+	void		parsRequest(std::string clientRequest);
 	void		handleRequest();
 
 	//getter
@@ -53,9 +56,8 @@ public :
 	const std::string getHeader(const std::string& key) {return _header[key];} ;
 	const std::string& getBody() const { return _body; }
 	const std::string& getError() const { return _error; }
-	const std::string getHTTPreponse() const {return _HTTPreponse.str();}
+	const std::string getHTTPreponse() const {return _HTTPresponse.str();}
 };
-
 
 std::ostream & operator<<(std::ostream &o, Request & request);
 

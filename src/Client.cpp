@@ -41,13 +41,44 @@ void		Client::setSocketFD(int socket_fd)
 	m_socket_fd = socket_fd;
 }
 
-
-Request&			Client::getRequest()
-{
-	return *m_request;
+bool Client::readSocket(int socket_fd, size_t max_size = 0) {
+	const size_t BUFFER_SIZE = 4096;
+	std::vector<char> buffer(BUFFER_SIZE);
+	
+	while (true) {
+		ssize_t bytes_lus = read(socket_fd, buffer.data(), BUFFER_SIZE);
+		
+		if (bytes_lus < 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				// Socket non-bloquante, pas plus de données disponibles
+				break;
+			} else {
+				throw std::runtime_error("Erreur lors de la lecture de la socket: " + 
+									   std::string(strerror(errno)));
+			}
+		} else if (bytes_lus == 0) {
+			// Connexion fermée par le peer
+			std::cout << YELLOW "hello" RESET << std::endl;
+			break;
+		} else {
+			// Vérifier la limite de taille si spécifiée
+			if (max_size > 0 && m_proccesing_request.size() + bytes_lus > max_size) {
+				size_t bytes_a_ajouter = max_size - m_proccesing_request.size();
+				m_proccesing_request.append(buffer.data(), bytes_a_ajouter);
+				break;
+			}
+			
+			m_proccesing_request.append(buffer.data(), bytes_lus);
+		}
+			
+	}
+	if (m_proccesing_request.find("\r\n\r\n") != std::string::npos)
+		return true;
+	return false;
 }
 
-void		Client::setRequest(Request& request)
+void			Client::clear()
 {
-	m_request = &request;
+	m_proccesing_request = "";
+	m_response = "";
 }
