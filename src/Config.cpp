@@ -1,16 +1,12 @@
 #include "Config.hpp"
 
-Config::Config()
+Config::Config(const std::string &configFile, std::vector<Server>& servers)
+:m_servers(servers)
 {
-	// find a default configuration ?
-}
-
-Config::Config(const std::string &configFile)
-{
-	m_state = GLOBAL;
 	Server				current_server;
 	std::stringstream	content;
 	std::fstream		configIn;
+	m_state = GLOBAL;
 
 	configIn.open(configFile.c_str(), std::ios::in);
 	if (!configIn.is_open())
@@ -29,7 +25,7 @@ Config::Config(const std::string &configFile)
 				if (!lookingFor(content, "{"))
 					throw std::runtime_error(ERROR_BRACKET);
 				m_servers.push_back(current_server);
-				//clear currentServer;
+				current_server.clear();
 				m_state = SERVER_BLOCK;
 			}
 			case SERVER_BLOCK:
@@ -43,7 +39,7 @@ Config::Config(const std::string &configFile)
 					throw std::runtime_error(ERROR_BRACKET);
 				m_state = LOCATION_BLOCK;
 			}
-			case LOCATION_BLOCK: // get line limited ;
+			case LOCATION_BLOCK:
 			{
 				parsingLocationInfo(content, m_state);
 				break ;
@@ -59,4 +55,10 @@ Config::Config(const std::string &configFile)
 Config::~Config()
 {
 
+}
+
+void	Config::addLocationInfo(std::string keyword, std::string info)
+{
+	std::cout << "Adding info " BLUE << keyword << " " << info << RESET << std::endl;
+	m_currentLoc.addInfo(keyword, info);
 }

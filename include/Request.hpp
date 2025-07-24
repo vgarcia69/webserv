@@ -43,10 +43,8 @@ public :
 	Request();
 	~Request(){};
 
-
 	void		parsRequest(int &fd);
 	void		handleRequest();
-
 
 	//getter
 	const std::string& getMethod() const { return _method; }

@@ -1,7 +1,8 @@
 #include "Config.hpp"
 #include "Server.hpp"
 
-// static void	runServer(Server& server);
+void	runServers(std::vector<Server>& servers);
+void	startServers(std::vector<Server>& servers);
 
 int main(int ac, char **av)
 {
@@ -13,35 +14,21 @@ int main(int ac, char **av)
 
 	try
 	{
-		Config config(av[1]);
+		std::vector<Server> servers;
+		std::string			config_file = "default.conf";
 
-		// for (unsigned i = 0; i < config.m_servers.size(); i++)
-		// {
-		// 	runServer(config.m_servers[i]);
-		// }
-		// wait(NULL);
-		config.m_servers[0].start();
-		config.m_servers[0].run();
+		if (av[1] != NULL)
+			config_file = av[1];
+
+		Config config(config_file, servers);
+
+		startServers(servers);
+		runServers(servers);
 	}
 	catch (std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
 		return 1;
 	}
-
 	return 0;
 }
-
-// static void	runServer(Server& server)
-// {
-// 	int pid;
-
-// 	pid = fork();
-// 	if (pid == -1)
-// 		std::cerr << "something" << std::endl;
-// 	else if (!pid)
-// 	{
-// 		server.start();
-// 		server.run();
-// 	}
-// }

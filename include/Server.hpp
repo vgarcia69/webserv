@@ -21,42 +21,36 @@
 	class Server
 	{
 		private:
-			StringMap					m_info;	
-			std::vector<Location>		m_locations;
-    		std::map<int, std::string>	m_errorPages;
-			std::vector<Client>			m_clients;
-
-			int							m_epoll_fd;
-			int							m_server_fd;
-			epoll_event					m_events[SOMAXCONN];
+			StringMap							m_info;	
+			std::map<std::string, Location>		m_locations;
+    		std::map<int, std::string>			m_errorPages;
+			std::vector<Client>					m_clients;
+			int									m_server_fd;
 
 		public:
 			Server();
 			~Server();
 
-			void		addLocation(std::string& root);
+			void		addLocation(Location loc, std::string& root);
 			void		addLocationInfo(std::string keyword, std::string info);
 			void		addInfo(std::string keyword, std::string info);
 			void		addErrorPage(int nbr, std::string path);
-			void		addConnexion(int& fd, epoll_event& event);
-			void		removeConnexion(int& fd, epoll_event& event);
-			void		handleClients(int& fd, epoll_event& event);
-			std::string	getLocationInfo(std::string keyword);
+
+			std::string	getLocationInfoOf(std::string keyword, Location& loc);
 			std::string	getInfo(std::string keyword);
 			std::string	getErrorPage(int nbr);
+			int			getServerFD();
 
-			class SafeExit: public std::exception
-			{
-				public:
-					const char* what() const throw()
-					{
-						return "Shutting Down the Server";
-					}
-			};
+			bool		init();
+			void		clear();
 
-			void		start();
-			void		run();
-			static void	shut(int);
+			static int	s_nb_servers_running;
+			static int	s_epoll_fd;
 	};
+
+    void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients);
+	void	removeConnexion(epoll_event& event, std::map<int, Client>& clients);
+    void	handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
+	void	handleResponse(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
 
 #endif

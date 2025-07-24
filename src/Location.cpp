@@ -43,3 +43,10 @@ std::string	Location::getInfo(std::string keyword)
 		return m_info[keyword];
 	return NOT_FOUND;
 }
+
+void	Location::clear()
+{
+	m_info.clear();
+	m_cgi.first = "";
+	m_cgi.second = "";
+}

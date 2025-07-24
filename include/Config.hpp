@@ -27,29 +27,31 @@
 	class Config
 	{
 		private:
-			ParsingState					m_state;
+			ParsingState			m_state;
+			Location				m_currentLoc;
 
 		public:
-			Config();
-			Config(const std::string& configFile);
+			Config(const std::string& configFile, std::vector<Server>& servers);
 			~Config();
 
-			std::vector<Server>				m_servers;
+			std::vector<Server>&	m_servers;
+
 			void	parsingServerInfo(std::stringstream& sequenced_line, ParsingState& state);
-			void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
 			void	parsingIPAddress(std::string address);
 			void	parsingPort(std::string& port);
 			void	parsingServerName(std::string& info);
 			void	parsingMaxBodySize(std::string& info);
 			void	parseDefaultFile(std::string& info);
-			void	checkRoot(std::string& info);
 			void	parseErrorPage(std::string& number, std::string& path);
-			void	parseMethods(std::stringstream& sequenced_line);
+
+			void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
+			void	parseLocDefaultFile(std::string& path);
 			void	parseReturn(std::string info);
 			void	parseAutoIndex(std::string info);
+			void	parseMethods(std::stringstream& sequenced_line);
 
-			void	parseLocDefaultFile(std::string& path);
-    		// void	ParsingLocationInfo(std::stringstream& content, ParsingState& state, Server& server);
+			void	checkRoot(std::string& info);
+			void	addLocationInfo(std::string keyword, std::string info);
 	};
 
 	bool	lookingFor(std::stringstream& content, std::string target);
