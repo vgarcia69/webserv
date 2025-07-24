@@ -42,7 +42,7 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 	epoll_ctl(Server::s_epoll_fd, EPOLL_CTL_DEL, event.data.fd, &event);
 	close(event.data.fd);
 	std::cout << "Removing Client: " << clients[event.data.fd].getSocketFD() << "." << std::endl;
-	// clients[event.data.fd].~Client();
+	clients.erase(event.data.fd);
 }
 
 void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
