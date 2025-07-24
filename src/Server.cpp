@@ -104,9 +104,13 @@ bool Server::init()
 		return 1;
 	}
 
-	event.events = EPOLLIN;
+	event.events = EPOLLIN | EPOLLRDHUP;
 	event.data.fd = m_server_fd;
-	epoll_ctl(s_epoll_fd, EPOLL_CTL_ADD, m_server_fd, &event);
+	if (epoll_ctl(s_epoll_fd, EPOLL_CTL_ADD, m_server_fd, &event))
+	{
+		std::cerr << "Epoll CTL failed" << std::endl;
+		return 1;
+	}
 	return 0;
 }
 

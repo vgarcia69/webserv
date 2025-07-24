@@ -35,10 +35,12 @@
 			void		addLocationInfo(std::string keyword, std::string info);
 			void		addInfo(std::string keyword, std::string info);
 			void		addErrorPage(int nbr, std::string path);
+
 			std::string	getLocationInfoOf(std::string keyword, Location& loc);
 			std::string	getInfo(std::string keyword);
 			std::string	getErrorPage(int nbr);
 			int			getServerFD();
+
 			bool		init();
 			void		clear();
 
@@ -48,6 +50,7 @@
 
     void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients);
 	void	removeConnexion(epoll_event& event, std::map<int, Client>& clients);
-    void	handleClients(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
+    void	handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
+	void	handleResponse(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
 
 #endif

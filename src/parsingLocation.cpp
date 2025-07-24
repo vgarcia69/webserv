@@ -29,11 +29,20 @@ void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState
 	{
 		parseReturn(info);
 	}
-	if (keyword == "}")
+	else if (keyword == "}")
 	{
 		state = SERVER_BLOCK;
 		m_servers.back().addLocation(m_currentLoc, m_currentLoc.m_root);
 		return ;
+	}
+	else if (keyword == DEFAULT_FILE)
+	{
+		parseLocDefaultFile(info);
+	}
+	else
+	{
+		std::cerr << "Instruct: "<< keyword  << " " << info << std::endl;
+		throw std::runtime_error("Unknown Location instruction");
 	}
 	sequenced_line >> keyword;
 	if (keyword != END_INSTRUC)
@@ -42,20 +51,20 @@ void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState
 
 void	Config::parseLocDefaultFile(std::string& path)
 {
-	std::string	root;
+	std::string	file_path;
 
-	root = m_servers.back().getLocationInfoOf(ROOT, m_currentLoc);
-	if (root == NOT_FOUND)
+	file_path = m_servers.back().getLocationInfoOf(ROOT, m_currentLoc);
+	if (file_path == NOT_FOUND)
 	{
-	    root = m_servers.back().getInfo(ROOT);
-	    if (root == NOT_FOUND)
-	    	root.clear();
+	    file_path = m_servers.back().getInfo(ROOT);
+	    if (file_path == NOT_FOUND)
+	    	file_path.clear();
 	}
-	root += path;
+	file_path += path;
 
-	if (access(root.c_str(), F_OK | R_OK))
+	if (access(file_path.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Error Page Path");
-	addLocationInfo(ROOT, root);
+	addLocationInfo(DEFAULT_FILE, file_path);
 }
 
 void	Config::parseMethods(std::stringstream& sequenced_line)
@@ -95,6 +104,7 @@ void	Config::parseReturn(std::string info)
 	    	root.clear();
 	}
 	root += info;
+	// std::cerr << root <<" info: "<< info <<  std::endl;
 	if (access(root.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Return Redirection");
 	addLocationInfo(RETURN, root);

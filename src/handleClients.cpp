@@ -47,18 +47,37 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 	clients[event.data.fd].~Client();
 }
 
-void    handleClients(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
+void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
 {
     // removeConnexion(client_fd, event);
     Request request;
 
     (void)event;
-	(void)clients;
     request.parsRequest(client_fd);
     // std::cout << request <<std::endl;
     request.handleRequest();
 
     std::string reponse = request.getHTTPreponse();
+	clients[client_fd].setRequest(request);
     // std::cout << "reponse is :\n" << reponse << std::endl;
-    send(client_fd, reponse.c_str(), reponse.length(), 0);
+    unsigned sent = send(client_fd, reponse.c_str(), reponse.length(), 0); // cut le content request de ce qui a ete envoyer
+
+	// check si send a tout envoyer  si oui continue, sinon activer epollout 
+	if (sent < reponse.length())
+    	epoll_ctl(Server::s_epoll_fd, EPOLL_CTL_MOD, client_fd, &event);	
+}
+
+void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients) // recuperer le remaining
+{
+	(void)event; 
+	std::cout << GREEN "HELLO ?" RESET << std::endl;
+	if (!clients.count(fd))
+	{
+		std::cerr << "oulalala pas normal" << std::endl;
+		return ;
+	}
+	Request		*request = &clients[fd].getRequest();
+	std::string	response = request->getHTTPreponse();
+
+    send(fd, response.c_str(), response.length(), 0);
 }

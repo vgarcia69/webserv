@@ -269,7 +269,6 @@ std::ostream & operator<<(std::ostream &o, Request & request) {
 	return o;
 }
 
-
 std::map<std::string, void (Request::*)()> Request::_createMethodMap() {
 	std::map<std::string, void (Request::*)()> m;
 	m["GET"]    = &Request::handleGET;

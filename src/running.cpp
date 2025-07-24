@@ -48,7 +48,9 @@ void	runServers(std::vector<Server>& servers)
 		fd_num = epoll_wait(Server::s_epoll_fd, events, SOMAXCONN, -1);
 		if (fd_num == -1)
 		{
-			std::cerr << "EPoll Function Cancelled" << std::endl;
+			if (!g_flag)
+				return ;
+			throw std::runtime_error("EPoll Function Cancelled");
 		}
 		for (int i = 0; i < fd_num; i++)
 		{
@@ -62,10 +64,15 @@ void	runServers(std::vector<Server>& servers)
 				std::cout << YELLOW "Removing client" RESET << std::endl;
 				removeConnexion(events[i], clients);
 			}
-			else
+			else if (events[i].events & EPOLLOUT)
+			{
+				std::cout << YELLOW "Handle client Response" RESET << std::endl;
+				handleResponse(events[i].data.fd, events[i], clients);
+			}
+			else if (events[i].events & EPOLLIN)
 			{
 				std::cout << YELLOW "Handle client Request" RESET << std::endl;
-				handleClients(events[i].data.fd, events[i], clients);
+				handleRequest(events[i].data.fd, events[i], clients);
 			}
 		}
 	}

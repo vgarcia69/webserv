@@ -41,3 +41,13 @@ void		Client::setSocketFD(int socket_fd)
 	m_socket_fd = socket_fd;
 }
 
+
+Request&			Client::getRequest()
+{
+	return *m_request;
+}
+
+void		Client::setRequest(Request& request)
+{
+	m_request = &request;
+}
