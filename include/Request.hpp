@@ -39,9 +39,6 @@ private :
 	static const std::map<std::string, void (Request::*)()> _methodMap;
 	static std::map<std::string, void (Request::*)()> _createMethodMap();
 
-protected :
-	std::string							_response;
-
 public :
 	Request();
 	~Request(){};
@@ -56,7 +53,7 @@ public :
 	const std::string getHeader(const std::string& key) {return _header[key];} ;
 	const std::string& getBody() const { return _body; }
 	const std::string& getError() const { return _error; }
-	const std::string getHTTPreponse() const {return _HTTPresponse.str();}
+	std::string getHTTPresponse() {return _HTTPresponse.str();}
 };
 
 std::ostream & operator<<(std::ostream &o, Request & request);
