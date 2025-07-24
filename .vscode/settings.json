@@ -53,6 +53,10 @@
 		"cstring": "cpp",
 		"ctime": "cpp",
 		"set": "cpp",
-		"cinttypes": "cpp"
+		"cinttypes": "cpp",
+		"chrono": "cpp",
+		"codecvt": "cpp",
+		"ratio": "cpp",
+		"iomanip": "cpp"
 	}
 }

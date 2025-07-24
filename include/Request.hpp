@@ -15,6 +15,7 @@
 #include <cstring>
 #include <functional>
 
+
 #include <unistd.h>
 
 class Request{
@@ -26,11 +27,13 @@ private :
 	std::string							_error;
 	std::ostringstream					_HTTPresponse;
 
-	void	processHeader();
+	//parse function
 	void	parsFirstLine(std::string & clientRequest);
 	void	parsHeader(std::string & clientRequest);
 	void	parsBody(std::string & clientRequest);
-
+	
+	//process response
+	void	processHeader();
 	void	handleError();
 	void	handleGET();
 	void	handlePOST();
@@ -47,13 +50,13 @@ public :
 	void		handleRequest();
 
 	//getter
-	const std::string& getMethod() const { return _method; }
-	const std::string& getURI() const { return _URI; }
-	const std::map<std::string, std::string>& getHeader() const { return _header; }
-	const std::string getHeader(const std::string& key) {return _header[key];} ;
-	const std::string& getBody() const { return _body; }
-	const std::string& getError() const { return _error; }
-	std::string getHTTPresponse() {return _HTTPresponse.str();}
+	const std::string& getMethod() const;
+	const std::string& getURI() const;
+	const std::map<std::string, std::string>& getHeader() const;
+	const std::string getHeader(const std::string& key);
+	const std::string& getBody() const;
+	const std::string& getError() const;
+	std::string getHTTPresponse();
 };
 
 std::ostream & operator<<(std::ostream &o, Request & request);
