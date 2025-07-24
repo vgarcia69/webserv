@@ -3,7 +3,6 @@
 
 void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients)
 {
-	Client		new_client;
 	sockaddr_in client_address;
 	socklen_t	address_size;
 
@@ -30,12 +29,11 @@ void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients)
 	char inet_str[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(client_address.sin_addr), inet_str, INET_ADDRSTRLEN);
 
-	new_client.setSocketFD(socket);
-	new_client.setIPAdress(inet_str);
-	clients[socket] = new_client;
+	clients[socket].setSocketFD(socket);
+	clients[socket].setIPAdress(inet_str);
 
 	std::cout << "Client " << socket << " Added Successfully." << std::endl;
-	std::cout << "Client IP Adress: " << new_client.getIPAdress() << std::endl;
+	std::cout << "Client IP Adress: " << clients[socket].getIPAdress() << std::endl;
 	
 }
 
@@ -50,24 +48,31 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
 {
     // removeConnexion(client_fd, event);
-    Request request;
-
     (void)event;
-    request.parsRequest(client_fd);
+	if (!clients[client_fd].readSocket(client_fd, 0))
+		return ;
+	
+	Request request;
+
+    request.parsRequest(clients[client_fd].getProcessRequest());
     // std::cout << request <<std::endl;
     request.handleRequest();
 
-    std::string reponse = request.getHTTPreponse();
-	clients[client_fd].setRequest(request);
-    // std::cout << "reponse is :\n" << reponse << std::endl;
-    unsigned sent = send(client_fd, reponse.c_str(), reponse.length(), 0); // cut le content request de ce qui a ete envoyer
+	clients[client_fd].m_response = request.getHTTPreponse();
+    // std::cout << "reponse is :\n" << clients[client_fd].m_response << std::endl;
+    unsigned sent = send(client_fd, clients[client_fd].m_response.c_str(), clients[client_fd].m_response.length(), 0);
 
-	// check si send a tout envoyer  si oui continue, sinon activer epollout 
-	if (sent < reponse.length())
-    	epoll_ctl(Server::s_epoll_fd, EPOLL_CTL_MOD, client_fd, &event);	
+	if (sent < clients[client_fd].m_response.length())
+	{
+		clients[client_fd].m_response.erase(0, sent);
+  		if (epoll_ctl(Server::s_epoll_fd, EPOLL_CTL_MOD, client_fd, &event))
+			throw std::runtime_error ("epoll_ctl failed");
+	}
+	else
+		clients[client_fd].clear();
 }
 
-void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients) // recuperer le remaining
+void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients)
 {
 	(void)event; 
 	std::cout << GREEN "HELLO ?" RESET << std::endl;
@@ -76,8 +81,14 @@ void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients)
 		std::cerr << "oulalala pas normal" << std::endl;
 		return ;
 	}
-	Request		*request = &clients[fd].getRequest();
-	std::string	response = request->getHTTPreponse();
-
-    send(fd, response.c_str(), response.length(), 0);
+	
+    unsigned sent = send(fd, clients[fd].m_response.c_str(), clients[fd].m_response.length(), 0);
+	if (sent < clients[fd].m_response.length())
+	{
+		clients[fd].m_response.erase(0, sent);
+  		if (epoll_ctl(Server::s_epoll_fd, EPOLL_CTL_MOD, fd, &event))
+			throw std::runtime_error ("epoll_ctl failed");
+	}
+	else
+		clients[fd].clear();
 }

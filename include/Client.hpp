@@ -10,23 +10,26 @@
 			int				m_port;
 			int				m_socket_fd;
 			std::string 	m_ip_address;
-			Request			*m_request;
-
+			std::string		m_proccesing_request;
 
 		public:
 		 	Client() {}
 			Client(std::string ip_address, int port, int socket_fd);
 			~Client();
 
+			std::string		m_response;
+
 			int				getPort();
 			std::string&	getIPAdress();
 			int				getSocketFD();
-			Request&		getRequest();
 
 			void			setPort(int);
 			void			setIPAdress(std::string);
 			void			setSocketFD(int);
-			void			setRequest(Request& request);
+			bool 			readSocket(int socket_fd, size_t max_size);
+			std::string		getProcessRequest() { return m_proccesing_request; }
+
+			void			clear();
 	};
 
 #endif
