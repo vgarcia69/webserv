@@ -104,7 +104,7 @@ bool Server::init()
 		return 1;
 	}
 
-	event.events = EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLRDHUP | EPOLLET;
+	event.events = EPOLLIN | EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = m_server_fd;
 	if (epoll_ctl(s_epoll_fd, EPOLL_CTL_ADD, m_server_fd, &event))
 	{

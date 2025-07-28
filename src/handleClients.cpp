@@ -75,13 +75,6 @@ void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>&
 
 void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients)
 {
-	std::cout << GREEN "HELLO ?" RESET << std::endl;
-	if (!clients.count(fd))
-	{
-		std::cerr << "oulalala pas normal" << std::endl;
-		return ;
-	}
-	
     unsigned sent = send(fd, clients[fd].m_response.c_str(), clients[fd].m_response.length(), 0);
 	if (sent < clients[fd].m_response.length())
 	{

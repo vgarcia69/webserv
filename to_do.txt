@@ -124,7 +124,5 @@ Server Error Responses:
 
 
 
-removeConnexion(client_fd, event); A faire dans les request si y rien a read
 
 a voir pour add les morceaux de requettes dans la string request du client, send la string direct ?
-
