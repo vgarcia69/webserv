@@ -44,33 +44,26 @@ void		Client::setSocketFD(int socket_fd)
 bool Client::readSocket(int socket_fd, size_t max_size = 0) {
 	const size_t BUFFER_SIZE = 4096;
 	std::vector<char> buffer(BUFFER_SIZE);
+	int bytes_lus = 4096;
 	
-	while (true) {
-		ssize_t bytes_lus = read(socket_fd, buffer.data(), BUFFER_SIZE);
+	std::cout << GREEN << "Going in" RESET << std::endl;
+	while (bytes_lus == 4096) {
+		bytes_lus = read(socket_fd, buffer.data(), BUFFER_SIZE);
 		
 		if (bytes_lus < 0) {
-			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// Socket non-bloquante, pas plus de données disponibles
-				break;
-			} else {
 				throw std::runtime_error("Erreur lors de la lecture de la socket: " + 
 									   std::string(strerror(errno)));
-			}
 		} else if (bytes_lus == 0) {
-			// Connexion fermée par le peer
-			std::cout << YELLOW "hello" RESET << std::endl;
-			break;
+			std::cout << YELLOW "essaie de deco ?" RESET << std::endl;
+			return false;
 		} else {
-			// Vérifier la limite de taille si spécifiée
 			if (max_size > 0 && m_processing_request.size() + bytes_lus > max_size) {
 				size_t bytes_a_ajouter = max_size - m_processing_request.size();
 				m_processing_request.append(buffer.data(), bytes_a_ajouter);
 				break;
 			}
-			
 			m_processing_request.append(buffer.data(), bytes_lus);
 		}
-			
 	}
 	if (m_processing_request.find("\r\n\r\n") != std::string::npos)
 		return true;

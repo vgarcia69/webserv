@@ -25,6 +25,11 @@
 	#define NOT_FOUND		"not_found"
 	#define END_INSTRUC 	";"
 
+	//  Supported CGI Languages
+	#define PYTHON		".py"
+	#define	JAVASCRIPT	".js"
+	#define	BASH		".sh"
+
 	#define ERROR_000	"TEST"	//-------------DELETE
 	#define ERROR_400	"400 Bad Request"
 	#define ERROR_404	"404 File Not Find"

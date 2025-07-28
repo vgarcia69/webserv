@@ -59,7 +59,7 @@ void	runServers(std::vector<Server>& servers)
 				std::cout << YELLOW "Adding new client" RESET << std::endl;
 				addConnexion(events[i].data.fd, events[i], clients);
 			}
-			else if (events[i].events & EPOLLRDHUP)
+			else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{
 				std::cout << YELLOW "Removing client" RESET << std::endl;
 				removeConnexion(events[i], clients);

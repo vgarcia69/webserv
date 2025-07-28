@@ -1,6 +1,6 @@
 NAME = webserv 
 
-SRCFILE = main Config Server Location parsing parsingUtils running Client parsingLocation Request/processRequest Request/Request Request/utils handleClients
+SRCFILE = main  Parsing/Config Server Parsing/Location Parsing/parsing  Parsing/parsingUtils running Client  Parsing/parsingLocation Request/processRequest Request/Request Request/utils handleClients
 SRCDIR= src/
 SRCFORMAT=.cpp
 SRCFILE := $(addprefix $(SRCDIR), $(SRCFILE))

@@ -31,10 +31,24 @@ void	Location::addInfo(std::string keyword, std::string info)
 	// }
 }
 
-void	Location::addCGI(std::string& suffix, std::string& info)
+void	Location::addCGIPath(std::string cgi_path)
 {
-	m_cgi = StringPair(suffix, info);
-	// a voir ajouter une pair avec le keyword extension
+	m_cgi_path.push_back(cgi_path);
+}
+
+void	Location::addCGIExt(std::string cgi_ext)
+{
+	m_cgi_ext.push_back(cgi_ext);
+}
+
+std::vector<std::string>	Location::getCGIPath()
+{
+	return m_cgi_path;
+}
+
+std::vector<std::string>	Location::getCGIExt()
+{
+	return m_cgi_ext;
 }
 
 std::string	Location::getInfo(std::string keyword)
@@ -47,6 +61,6 @@ std::string	Location::getInfo(std::string keyword)
 void	Location::clear()
 {
 	m_info.clear();
-	m_cgi.first = "";
-	m_cgi.second = "";
+	m_cgi_path.clear();
+	m_cgi_ext.clear();
 }

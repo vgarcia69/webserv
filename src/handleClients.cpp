@@ -13,7 +13,7 @@ void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients)
 	if (socket == -1)
 		throw std::runtime_error("New Socket Failed to Init");
 	
-	event.events = EPOLLIN | EPOLLRDHUP;
+	event.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
 	event.data.fd = socket;
 	epoll_ctl(Server::s_epoll_fd, EPOLL_CTL_ADD, socket, &event);
 
@@ -47,15 +47,16 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 
 void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
 {
-    // removeConnexion(client_fd, event);
-    (void)event;
 	if (!clients[client_fd].readSocket(client_fd, 0))
+	{
+    	removeConnexion(event, clients);
 		return ;
+	}
 	
 	Request request;
 
     request.parsRequest(clients[client_fd].getProcessRequest());
-    // std::cout << request <<std::endl;
+    // std::cout << request << std::endl;
     request.handleRequest();
 
 	clients[client_fd].m_response = request.getHTTPresponse();
@@ -74,7 +75,6 @@ void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>&
 
 void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients)
 {
-	(void)event; 
 	std::cout << GREEN "HELLO ?" RESET << std::endl;
 	if (!clients.count(fd))
 	{

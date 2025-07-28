@@ -98,7 +98,7 @@ void	Config::parsingMaxBodySize(std::string& info)
 		m_servers.back().addInfo(MAX_SIZE, info);
 }
 
-static bool isDirectory(const std::string& path)
+bool isDirectory(const std::string& path)
 {
     struct stat file_stat;
 

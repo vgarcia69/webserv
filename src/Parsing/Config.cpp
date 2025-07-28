@@ -62,3 +62,13 @@ void	Config::addLocationInfo(std::string keyword, std::string info)
 	std::cout << "Adding info " BLUE << keyword << " " << info << RESET << std::endl;
 	m_currentLoc.addInfo(keyword, info);
 }
+
+void	Config::addLocCGIPath(std::string& keyword)
+{
+	m_currentLoc.addCGIPath(keyword);
+}
+
+void	Config::addLocCGIExt(std::string& keyword)
+{
+	m_currentLoc.addCGIExt(keyword);
+}
