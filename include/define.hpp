@@ -25,23 +25,24 @@
 	#define NOT_FOUND		"not_found"
 	#define END_INSTRUC 	";"
 
-	#define ERROR_000	"TEST"	//-------------DELETE
-	#define ERROR_400	"400 Bad Request"
-	#define ERROR_404	"404 File Not Find"
-	#define ERROR_405	"405 Method Not Allowed"
-	#define ERROR_411	"411 Length Required"
-	#define ERROR_413	"413 Content Too Large"
-	#define ERROR_501	"501 Not Implemented"
-	#define ERROR_505	"505 HTTP Version Not Supported"
+	#define BUFFER_SIZE		4096
 
-	#define BLACK   "\033[30m"
-	#define RED     "\033[31m"
-	#define GREEN   "\033[32m"
-	#define YELLOW  "\033[33m"
-	#define BLUE    "\033[34m"
-	#define MAGENTA "\033[35m"
-	#define CYAN    "\033[36m"
-	#define WHITE   "\033[37m"
-	#define RESET	"\033[0m"	
+	#define ERROR_400		"400 Bad Request"
+	#define ERROR_404		"404 File Not Find"
+	#define ERROR_405		"405 Method Not Allowed"
+	#define ERROR_411		"411 Length Required"
+	#define ERROR_413		"413 Content Too Large"
+	#define ERROR_501		"501 Not Implemented"
+	#define ERROR_505		"505 HTTP Version Not Supported"
+
+	#define BLACK			"\033[30m"
+	#define RED				"\033[31m"
+	#define GREEN			"\033[32m"
+	#define YELLOW			"\033[33m"
+	#define BLUE			"\033[34m"
+	#define MAGENTA			"\033[35m"
+	#define CYAN			"\033[36m"
+	#define WHITE			"\033[37m"
+	#define RESET			"\033[0m"
 
 #endif

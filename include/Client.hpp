@@ -11,6 +11,7 @@
 			int				m_socket_fd;
 			std::string 	m_ip_address;
 			std::string		m_processing_request;
+			bool			prevIsPOST;
 
 		public:
 		 	Client() {}
@@ -26,7 +27,8 @@
 			void			setPort(int);
 			void			setIPAdress(std::string);
 			void			setSocketFD(int);
-			bool 			readSocket(int socket_fd, size_t max_size);
+			bool 			readSocketBoundary(int socket_fd, size_t sizeBody);
+			bool 			readSocketRequest(int socket_fd, size_t max_size);
 			std::string		getProcessRequest() { return m_processing_request; }
 
 			void			clear();
