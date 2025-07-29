@@ -46,8 +46,10 @@ void Request::handleRequest(void) {
 
 
 	}
-	std::map<std::string, void (Request::*)()>::const_iterator it = _methodMap.find(_method);
-	(this->*it->second)();
+	else {
+		std::map<std::string, void (Request::*)()>::const_iterator it = _methodMap.find(_method);
+		(this->*it->second)();
+	}
 }
 
 void	Request::processHeader(){
@@ -63,6 +65,7 @@ void	Request::processHeader(){
 
 	//name					---------------------------------------------------------------------------------------------------------- mettre le vrai nom du server
 	_HTTPresponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
+
 
 	if (_error == ERROR_413){
 		//------------------------------------------------------------------------------------------------- fermer la connexion
@@ -93,7 +96,6 @@ void	Request::handleError(){
 		_HTTPresponse << "\r\n\r\n";
 	}
 	//-------------------------------------------------------------------------------------------si erreur 401 doit faire qqc de special.
-	std::cout << "handle Error/n";
 }
 
 void	Request::handleGET(){
@@ -124,16 +126,39 @@ void	Request::handleGET(){
 		page += '\n';
 	}
 
-	_HTTPresponse <<  "HTTP/1.1 200 OK\r\n";
+	_HTTPresponse << "HTTP/1.1 200 OK\r\n";
 	processHeader();
-	_HTTPresponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
-	_HTTPresponse <<  page;
+	_HTTPresponse << "Content-Length: " << page.length() << "\r\n\r\n";
+	_HTTPresponse << page;
 }
 
 void	Request::handlePOST(){
-	_HTTPresponse <<  "handle POST\n";
+	_HTTPresponse << "handle POST\n";
 }
 
 void	Request::handleDELETE(){
-	_HTTPresponse <<  "handle DELETE\n";
+	if (std::remove(_URI.c_str()) == 0) {
+		_HTTPresponse << "HTTP/1.1 200 OK\r\n";
+		processHeader();
+		return ;
+	}
+	
+	switch (errno) {
+		case ENOENT:
+			_HTTPresponse << "HTTP/1.1 404 Not Found\r\n";
+			break ;
+		case EACCES:
+			_HTTPresponse << "HTTP/1.1 403 Forbidden\r\n";
+			break ;
+		case EBUSY:
+			_HTTPresponse << "HTTP/1.1 409 Conflict\r\n";
+			break ;
+		case EROFS:
+			_HTTPresponse << "HTTP/1.1 403 Forbidden\r\n";
+			break ;
+		default:
+			_HTTPresponse << "HTTP/1.1 500 Internal Server Error\r\n";
+			break ;
+	}
+	processHeader();
 }
