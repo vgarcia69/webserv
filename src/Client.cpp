@@ -58,13 +58,10 @@ bool Client::readSocket(int socket_fd, size_t max_size = 0) {
 			std::cout << YELLOW "essaie de deco ?" RESET << std::endl;
 			return false;
 		} else {
-			if (m_processing_request.size() + bytes_lus > max_size) {
-				//est-ce necessaire d'ajouter?
-				size_t bytes_a_ajouter = max_size - m_processing_request.size();
-				m_processing_request.append(buffer.data(), bytes_a_ajouter);
+			if (max_size > 0 &&  m_processing_request.size() + bytes_lus > max_size + 2048)		//accept more byt for the header
+			{
 				//----------------------------------------------------------------------------------------gérer l'erreur 413 : fichier trop grand
 				//renvoyer l'erreur + fermé la connexion
-				std::cout << ERROR_413;
 				break;
 			}
 			m_processing_request.append(buffer.data(), bytes_lus);

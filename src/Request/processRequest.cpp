@@ -132,14 +132,52 @@ void	Request::handleGET(){
 	_HTTPresponse << page;
 }
 
+
+// 204 Aucune Maudification
+//200 ou 201 : doit renvoyer un corp (soit la ressource chargé, soit la une page)
+
 void	Request::handlePOST(){
-	_HTTPresponse << "handle POST\n";
+	
+	//find filename
+	size_t	startFilename = _body.find("filename=\"");
+	size_t endFilename = _body.find("\"\r\n", startFilename + 10);
+	if (startFilename == std::string::npos || endFilename == std::string::npos){	
+		_error = ERROR_400;
+		return (handleError());
+	}
+	startFilename += 10; //lenght of filname="
+	std::string NameFile = _body.substr(startFilename, endFilename - startFilename);
+	if (NameFile.empty()){	
+		_error = ERROR_400;
+		return (handleError());
+	}
+
+	std::cout << "\n\n\n\n\nici : [" << NameFile  << "]\n\n\n\n\n\n\n\n\n\n\n" << startFilename << " - " << endFilename << std::endl;
+
+
+	size_t endHeader = _body.find("\r\n\r\n");
+	if (endHeader == std::string::npos){	
+		_error = ERROR_400;
+		return (handleError());
+	}
+	std::ofstream file(NameFile.c_str());
+	file << _body.substr(endHeader);
+	
+	
+	//si 201 Created, inclure le Location: URI
+
+	_HTTPresponse << "HTTP/1.1 204 No Content\r\n";
+	processHeader();
+	//----------------------------------------------------------------- avec 201 DOIT indiquer l'URI du fichier créer
+	// _HTTPresponse << "Location: " << "127.0.0.1:8003/" << _URI <<"\r\n";
+	_HTTPresponse << "\r\n";
 }
 
 void	Request::handleDELETE(){
 	if (std::remove(_URI.c_str()) == 0) {
 		_HTTPresponse << "HTTP/1.1 200 OK\r\n";
 		processHeader();
+		_HTTPresponse << "\r\n";
 		return ;
 	}
 	

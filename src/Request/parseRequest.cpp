@@ -152,92 +152,19 @@ void		Request::parsBody(std::string &clientRequest){
 
 	//case of POST method
 
-	//check body method
-	std::string	TransferEncoding;
-	if (_header.find("transfer-encoding") != _header.end()){
-		TransferEncoding = _header["transfer-encoding"];
-	}
-
-	//case no content-lenght and no TransferEncoding "chunked"
-	if (_header.find("content-length") == _header.end() && TransferEncoding.empty()){
+	if (_header.find("content-length") == _header.end() ){
 		_error = ERROR_411;
-		return ;
 	}
-
-	//case no content-lenght and TransferEncoding != "chunked" (not implement)
-	if (/*_header.find("content-length") == _header.end() && */TransferEncoding != "chunked"){
-		_error = ERROR_501;
-		// _error = "415 Unsupported Media Type";
-		return ;
-	}
-
-	//case content-lenght + transfer encoding chunked
-	if (_header.find("content-length") != _header.end()  && TransferEncoding.empty() == false){
-		_error = ERROR_400;
-		return ;
-	}
-
-
-	//case of content-lenght:
-	if (_header.find("content-length") != _header.end()){
+	else
+	{
 		long int nb_char = strtol(_header["content-length"].c_str(), NULL, 10);
 		if (errno == ERANGE || nb_char < 0){
 			errno = 0;
 			_error = ERROR_400;
 			return ;
 		}
-		//old version
-		// char buffer[nb_char + 1];
-		// clientRequest.read(buffer, nb_char);
-		// buffer[nb_char] = '\0';
-		
 		_body = clientRequest.substr(0, nb_char);
-		return ;
 	}
-
-	else if (TransferEncoding != "chunked"){
-		_error = ERROR_501;
-	}
-
-	//case of no information of body, consider is empty
-	else
-		return ;
-
-}
-
-bool Request::readSocketBoundary(int socket_fd) {
-	(void)socket_fd;
-	return true;
-	// //peut-etre gerer le cas d'une config avec un fichier plus petit que 4096 bit?
-	// std::vector<char> buffer(BUFFER_SIZE);
-	// int bytes_lus = 4096;
-	
-	// std::cout << GREEN << "Going in" RESET << std::endl;
-	// while (bytes_lus == 4096) {
-	// 	bytes_lus = read(socket_fd, buffer.data(), BUFFER_SIZE);
-		
-	// 	if (bytes_lus < 0) {
-	// 			throw std::runtime_error("Erreur lors de la lecture de la socket: " + 
-	// 								   std::string(strerror(errno)));
-	// 	} else if (bytes_lus == 0) {
-	// 		std::cout << YELLOW "essaie de deco ?" RESET << std::endl;
-	// 		return false;
-	// 	} else {
-	// 		if (m_processing_request.size() + bytes_lus > max_size) {
-	// 			//est-ce necessaire d'ajouter?
-	// 			size_t bytes_a_ajouter = max_size - m_processing_request.size();
-	// 			m_processing_request.append(buffer.data(), bytes_a_ajouter);
-	// 			//----------------------------------------------------------------------------------------gérer l'erreur 413 : fichier trop grand
-	// 			//renvoyer l'erreur + fermé la connexion
-	// 			std::cout << ERROR_413;
-	// 			break;
-	// 		}
-	// 		m_processing_request.append(buffer.data(), bytes_lus);
-	// 	}
-	// }
-	// if (m_processing_request.find("\r\n\r\n") != std::string::npos)
-	// 	return true;
-	// return false;
 }
 
 void		Request::parsRequest(std::string clientRequest){

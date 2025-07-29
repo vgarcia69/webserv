@@ -44,23 +44,25 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 	clients.erase(event.data.fd);
 }
 
-void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
+void	handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
 {
 	if (!clients[client_fd].readSocket(client_fd, 0))
 	{
-    	removeConnexion(event, clients);
+		removeConnexion(event, clients);
 		return ;
 	}
 	
 	Request request;
 
-    request.parsRequest(clients[client_fd].getProcessRequest());
-    // std::cout << request << std::endl;
-    request.handleRequest();
+	std::cout << clients[client_fd].getProcessRequest() <<std::endl;
+
+	request.parsRequest(clients[client_fd].getProcessRequest());
+	std::cout << request << std::endl;
+	request.handleRequest();
 
 	clients[client_fd].m_response = request.getHTTPresponse();
-    // std::cout << "reponse is :\n" << clients[client_fd].m_response << std::endl;
-    unsigned sent = send(client_fd, clients[client_fd].m_response.c_str(), clients[client_fd].m_response.length(), 0);
+	std::cout << "reponse is :\n" << clients[client_fd].m_response << std::endl;
+	unsigned sent = send(client_fd, clients[client_fd].m_response.c_str(), clients[client_fd].m_response.length(), 0);
 
 	if (sent < clients[client_fd].m_response.length())
 	{
@@ -74,7 +76,7 @@ void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>&
 
 void	handleResponse(int& fd, epoll_event& event, std::map<int, Client>& clients)
 {
-    unsigned sent = send(fd, clients[fd].m_response.c_str(), clients[fd].m_response.length(), 0);
+	unsigned sent = send(fd, clients[fd].m_response.c_str(), clients[fd].m_response.length(), 0);
 	if (sent < clients[fd].m_response.length())
 	{
 		clients[fd].m_response.erase(0, sent);

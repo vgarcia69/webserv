@@ -1,0 +1,23 @@
+adding: host 127.0.0.1
+adding: listen 8003
+adding: server_name test
+adding: client_max_body_size 1024
+adding: root docs/fusion_web/
+adding: index docs/fusion_web/index.html
+docs/fusion_web/./tours
+Adding [32mdocs/fusion_web/./tours[0m
+Adding info [34mautoindex on[0m
+Adding info [34mPOST POST[0m
+Adding info [34mGET GET[0m
+Adding info [34mindex docs/fusion_web/index.html[0m
+Adding info [34mreturn docs/fusion_web/abc/index1.html[0m
+docs/fusion_web/./cgi-bin
+Adding [32mdocs/fusion_web/./cgi-bin[0m
+adding: host 127.10.1.4
+adding: listen 8003
+adding: server_name geuwiger
+adding: client_max_body_size 1024
+adding: root docs/fusion_web/
+adding: index docs/fusion_web/index.html
+[33mShutting down the Servers[0m
+EPoll Function Cancelled
