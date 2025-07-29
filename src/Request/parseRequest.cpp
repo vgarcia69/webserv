@@ -142,22 +142,14 @@ void		Request::parsHeader(std::string & clientRequest){
 	{
 		_server_index = getServerIndex(_header["host"]);
 	}
-}
-
-int Request::getServerIndex(std::string address)
-{
-	int pos = address.find(":");
-	address.erase(pos);
-	std::cout << address << std::endl;
-	if (address == "localhost")
-		address = "127.0.0.1";
-
-	for (unsigned i = 0; i < _servers.size(); i++)
+	
+	std::string URIchecking = checkURI();
+	if (URIchecking != "OK")
 	{
-		if (_servers[i].getInfo(HOST) == address)
-			return i;
+		_error = URIchecking;
+		std::cout << YELLOW << _error  << RESET << std::endl;
+		return ;
 	}
-	return -1;
 }
 
 void		Request::parsBody(std::string &clientRequest){

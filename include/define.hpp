@@ -32,7 +32,7 @@
 
 	#define ERROR_000	"TEST"	//-------------DELETE
 	#define ERROR_400	"400 Bad Request"
-	#define ERROR_404	"404 File Not Find"
+	#define ERROR_404	"404 File Not Found"
 	#define ERROR_405	"405 Method Not Allowed"
 	#define ERROR_411	"411 Length Required"
 	#define ERROR_413	"413 Content Too Large"

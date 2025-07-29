@@ -55,7 +55,7 @@ void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>&
 	Request request(servers);
 
     request.parsRequest(clients[client_fd].getProcessRequest());
-    // std::cout << request << std::endl;
+    std::cout << request << std::endl;
     request.handleRequest();
 
 	clients[client_fd].m_response = request.getHTTPresponse();

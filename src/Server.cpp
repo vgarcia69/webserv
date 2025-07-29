@@ -5,6 +5,9 @@ int	Server::s_epoll_fd = 0;
 
 Server::Server()
 {
+	m_info.insert(m_info.end(), StringPair(HOST, "127.0.0.1"));	
+	m_info.insert(m_info.end(), StringPair(PORT, "8080"));	
+	m_info.insert(m_info.end(), StringPair(SERVER_NAME, "default_name"));	
 	m_server_fd = 0;
 }
 
@@ -66,6 +69,11 @@ static int string_to_int(std::string host)
     uint32_t ip = (a << 24) | (b << 16) | (c << 8) | d;
 
     return (htonl(ip));
+}
+
+std::map<std::string, Location> Server::getLocations()
+{
+	return m_locations;
 }
 
 bool Server::init()

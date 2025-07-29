@@ -41,6 +41,7 @@
 			std::string	getInfo(std::string keyword);
 			std::string	getErrorPage(int nbr);
 			int			getServerFD();
+			std::map<std::string, Location> getLocations();
 
 			bool		init();
 			void		clear();

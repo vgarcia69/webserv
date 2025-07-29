@@ -55,7 +55,6 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 		std::cerr << "Instruct: "<< keyword  << " " << info << std::endl;
 		throw std::runtime_error("Unknown instruction");
 	}
-
 	
 	sequenced_line >> keyword;
 	if (keyword != END_INSTRUC)

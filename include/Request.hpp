@@ -60,7 +60,10 @@ public :
 	const std::string getHeader(const std::string& key);
 	const std::string& getBody() const;
 	const std::string& getError() const;
-	int 			   getServerIndex(std::string address);
+
+	int 			  	getServerIndex(std::string address);
+	std::string 		checkURI();
+
 	std::string getHTTPresponse();
 };
 
