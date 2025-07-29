@@ -34,7 +34,6 @@ void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients)
 
 	std::cout << "Client " << socket << " Added Successfully." << std::endl;
 	std::cout << "Client IP Adress: " << clients[socket].getIPAdress() << std::endl;
-	
 }
 
 void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
