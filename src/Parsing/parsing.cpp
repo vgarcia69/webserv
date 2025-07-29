@@ -11,10 +11,13 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 		sequenced_line >> info;
 		info.insert(0, 1, '.');
 		std::string root = m_servers.back().getInfo(ROOT);
-
 		if (root == NOT_FOUND)
 			root.clear();
 		root += info;
+
+		std::cout << root << std::endl;
+		if (!isDirectory(root))
+			throw std::runtime_error("Invalid Location Path");
 		m_servers.back().addLocation(m_currentLoc, root);
 		std::cout << "Adding " GREEN << root << RESET << std::endl;
 		m_currentLoc.clear();

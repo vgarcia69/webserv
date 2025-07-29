@@ -44,6 +44,9 @@
 			void	parseDefaultFile(std::string& info);
 			void	parseErrorPage(std::string& number, std::string& path);
 
+			void	parseCGIPath(std::stringstream& sequenced_line);
+			void	parseCGIExt(std::stringstream& sequenced_line);
+
 			void	parsingLocationInfo(std::stringstream& sequenced_line, ParsingState& state);
 			void	parseLocDefaultFile(std::string& path);
 			void	parseReturn(std::string info);
@@ -52,9 +55,12 @@
 
 			void	checkRoot(std::string& info);
 			void	addLocationInfo(std::string keyword, std::string info);
+			void	addLocCGIPath(std::string& info);
+			void	addLocCGIExt(std::string& info);
 	};
 
 	bool	lookingFor(std::stringstream& content, std::string target);
 	void	setupContent(std::fstream& configIn, std::stringstream& content);
+	bool	isDirectory(const std::string& path);
 
 #endif

@@ -31,6 +31,7 @@ private :
 	void	parsFirstLine(std::string & clientRequest);
 	void	parsHeader(std::string & clientRequest);
 	void	parsBody(std::string & clientRequest);
+	bool 	readSocketBoundary(int socket_fd);
 	
 	//process response
 	void	processHeader();

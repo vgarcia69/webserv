@@ -9,11 +9,22 @@ void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState
 	if (keyword == "}")
 	{
 		state = SERVER_BLOCK;
+		m_servers.back().addLocation(m_currentLoc, m_currentLoc.m_root);
 		return ;
 	}
 	else if (keyword == METHODS)
 	{
 		parseMethods(sequenced_line);
+		return ;
+	}
+	else if (keyword == CGI_PATH)
+	{
+		parseCGIPath(sequenced_line);
+		return ;
+	}
+	else if (keyword == CGI_EXT)
+	{
+		parseCGIExt(sequenced_line);
 		return ;
 	}
 	sequenced_line >> info;
@@ -28,12 +39,6 @@ void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState
 	else if (keyword == RETURN)
 	{
 		parseReturn(info);
-	}
-	else if (keyword == "}")
-	{
-		state = SERVER_BLOCK;
-		m_servers.back().addLocation(m_currentLoc, m_currentLoc.m_root);
-		return ;
 	}
 	else if (keyword == DEFAULT_FILE)
 	{
@@ -108,4 +113,38 @@ void	Config::parseReturn(std::string info)
 	if (access(root.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Return Redirection");
 	addLocationInfo(RETURN, root);
+}
+
+void	Config::parseCGIPath(std::stringstream& sequenced_line)
+{
+	std::string keyword;
+
+	while (!sequenced_line.fail())
+	{
+		sequenced_line >> keyword;
+		if (access(keyword.c_str(), F_OK | R_OK))
+		{
+			if (keyword != END_INSTRUC)
+				throw std::runtime_error("Invalid CGI Path");
+			break ;
+		}
+		addLocCGIPath(keyword);
+	}
+}
+
+void	Config::parseCGIExt(std::stringstream& sequenced_line)
+{
+	std::string keyword;
+
+	while (!sequenced_line.fail())
+	{
+		sequenced_line >> keyword;
+		if (keyword != PYTHON && keyword != JAVASCRIPT && keyword != BASH)
+		{
+			if (keyword != END_INSTRUC)
+				throw std::runtime_error("Invalid Syntax CGI Extension");
+			break ;
+		}
+		addLocCGIExt(keyword);
+	}
 }

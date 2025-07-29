@@ -13,8 +13,9 @@
 	class Location
 	{
 		private:
-			StringMap					m_info;	
-			StringPair					m_cgi;
+			StringMap					m_info;
+			std::vector<std::string>	m_cgi_path;
+			std::vector<std::string>	m_cgi_ext;
 
 		public:
 			Location();			
@@ -22,11 +23,14 @@
 			
 			std::string					m_root;
 
-			std::string	getInfo(std::string keyword);
-			void		addInfo(std::string keyword, std::string info);
-			void		addCGI(std::string& suffix, std::string& info);
+			std::vector<std::string>	getCGIPath();
+			std::vector<std::string>	getCGIExt();
+			std::string					getInfo(std::string keyword);
+
+			void						addInfo(std::string keyword, std::string info);
+			void						addCGIPath(std::string cgi_path);
+			void						addCGIExt(std::string cgi_ext);
 			void		clear();
 	};
-
 
 #endif

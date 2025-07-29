@@ -138,6 +138,10 @@ void		Request::parsHeader(std::string & clientRequest){
 		_error = ERROR_400;
 		return ;
 	}
+	else {
+		//----------------------------------------------------------------------faitparsing
+		std::cout << _header["host"] <<std::endl;
+	}
 }
 
 
@@ -191,18 +195,49 @@ void		Request::parsBody(std::string &clientRequest){
 		return ;
 	}
 
-	else if (TransferEncoding == "chunked"){
-		// std::string line;
-		// while (clientRequest.eof() == false) {
-		// 	std::getline(clientRequest, line);
-		// 	_body += line + "\n";
-		// }
+	else if (TransferEncoding != "chunked"){
+		_error = ERROR_501;
 	}
 
 	//case of no information of body, consider is empty
 	else
 		return ;
 
+}
+
+bool Request::readSocketBoundary(int socket_fd) {
+	(void)socket_fd;
+	return true;
+	// //peut-etre gerer le cas d'une config avec un fichier plus petit que 4096 bit?
+	// std::vector<char> buffer(BUFFER_SIZE);
+	// int bytes_lus = 4096;
+	
+	// std::cout << GREEN << "Going in" RESET << std::endl;
+	// while (bytes_lus == 4096) {
+	// 	bytes_lus = read(socket_fd, buffer.data(), BUFFER_SIZE);
+		
+	// 	if (bytes_lus < 0) {
+	// 			throw std::runtime_error("Erreur lors de la lecture de la socket: " + 
+	// 								   std::string(strerror(errno)));
+	// 	} else if (bytes_lus == 0) {
+	// 		std::cout << YELLOW "essaie de deco ?" RESET << std::endl;
+	// 		return false;
+	// 	} else {
+	// 		if (m_processing_request.size() + bytes_lus > max_size) {
+	// 			//est-ce necessaire d'ajouter?
+	// 			size_t bytes_a_ajouter = max_size - m_processing_request.size();
+	// 			m_processing_request.append(buffer.data(), bytes_a_ajouter);
+	// 			//----------------------------------------------------------------------------------------gérer l'erreur 413 : fichier trop grand
+	// 			//renvoyer l'erreur + fermé la connexion
+	// 			std::cout << ERROR_413;
+	// 			break;
+	// 		}
+	// 		m_processing_request.append(buffer.data(), bytes_lus);
+	// 	}
+	// }
+	// if (m_processing_request.find("\r\n\r\n") != std::string::npos)
+	// 	return true;
+	// return false;
 }
 
 void		Request::parsRequest(std::string clientRequest){

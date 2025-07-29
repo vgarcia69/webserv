@@ -27,6 +27,11 @@
 
 	#define BUFFER_SIZE		4096
 
+	//  Supported CGI Languages
+	#define PYTHON		".py"
+	#define	JAVASCRIPT	".js"
+	#define	BASH		".sh"
+
 	#define ERROR_400		"400 Bad Request"
 	#define ERROR_404		"404 File Not Find"
 	#define ERROR_405		"405 Method Not Allowed"
