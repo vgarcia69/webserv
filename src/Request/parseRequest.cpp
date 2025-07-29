@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request(void): _HTTPresponse(""){}
+Request::Request(std::vector<Server>& servers): _servers(servers),_HTTPresponse("") {}
 
 void		Request::parsFirstLine(std::string &clientRequest) {
 	
@@ -138,12 +138,27 @@ void		Request::parsHeader(std::string & clientRequest){
 		_error = ERROR_400;
 		return ;
 	}
-	else {
-		//----------------------------------------------------------------------faitparsing
-		std::cout << _header["host"] <<std::endl;
+	else
+	{
+		_server_index = getServerIndex(_header["host"]);
 	}
 }
 
+int Request::getServerIndex(std::string address)
+{
+	int pos = address.find(":");
+	address.erase(pos);
+	std::cout << address << std::endl;
+	if (address == "localhost")
+		address = "127.0.0.1";
+
+	for (unsigned i = 0; i < _servers.size(); i++)
+	{
+		if (_servers[i].getInfo(HOST) == address)
+			return i;
+	}
+	return -1;
+}
 
 void		Request::parsBody(std::string &clientRequest){
 	if (_method != "POST") {

@@ -18,6 +18,7 @@
 	typedef std::map <std::string, std::string>	StringMap;
 	typedef std::pair<std::string, std::string> StringPair;
 
+	class Client;
 	class Server
 	{
 		private:
@@ -50,7 +51,7 @@
 
     void	addConnexion(int& fd, epoll_event& event, std::map<int, Client>& clients);
 	void	removeConnexion(epoll_event& event, std::map<int, Client>& clients);
-    void	handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
+    void	handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients, std::vector<Server> &servers);
 	void	handleResponse(int& client_fd, epoll_event& event, std::map<int, Client>& clients);
 
 #endif

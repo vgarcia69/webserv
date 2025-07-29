@@ -72,7 +72,7 @@ void	runServers(std::vector<Server>& servers)
 			else if (events[i].events & EPOLLIN)
 			{
 				std::cout << YELLOW "Handle client Request" RESET << std::endl;
-				handleRequest(events[i].data.fd, events[i], clients);
+				handleRequest(events[i].data.fd, events[i], clients, servers);
 			}
 		}
 	}

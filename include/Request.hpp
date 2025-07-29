@@ -14,12 +14,16 @@
 #include <cstdlib>
 #include <cstring>
 #include <functional>
-
+#include "Server.hpp"
 
 #include <unistd.h>
 
+class Server;
+
 class Request{
 private :
+	std::vector<Server>					&_servers;
+	int									_server_index;
 	std::string							_method;
 	std::string							_URI;					// URI : Uniform Resource Identifier
 	std::map<std::string, std::string>	_header;
@@ -43,7 +47,7 @@ private :
 	static std::map<std::string, void (Request::*)()> _createMethodMap();
 
 public :
-	Request();
+	Request(std::vector<Server>& servers);
 	~Request(){};
 
 	void		parsRequest(std::string clientRequest);
@@ -56,6 +60,7 @@ public :
 	const std::string getHeader(const std::string& key);
 	const std::string& getBody() const;
 	const std::string& getError() const;
+	int 			   getServerIndex(std::string address);
 	std::string getHTTPresponse();
 };
 

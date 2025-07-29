@@ -44,7 +44,7 @@ void	removeConnexion(epoll_event& event, std::map<int, Client>& clients)
 	clients.erase(event.data.fd);
 }
 
-void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients)
+void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& clients, std::vector<Server>& servers)
 {
 	if (!clients[client_fd].readSocket(client_fd, 0))
 	{
@@ -52,7 +52,7 @@ void    handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>&
 		return ;
 	}
 	
-	Request request;
+	Request request(servers);
 
     request.parsRequest(clients[client_fd].getProcessRequest());
     // std::cout << request << std::endl;
