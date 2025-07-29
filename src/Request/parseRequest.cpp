@@ -138,6 +138,10 @@ void		Request::parsHeader(std::string & clientRequest){
 		_error = ERROR_400;
 		return ;
 	}
+	else {
+		//----------------------------------------------------------------------faitparsing
+		std::cout << _header["host"] <<std::endl;
+	}
 }
 
 
