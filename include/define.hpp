@@ -37,6 +37,7 @@
 	#define ERROR_405		"405 Method Not Allowed"
 	#define ERROR_411		"411 Length Required"
 	#define ERROR_413		"413 Content Too Large"
+	#define ERROR_500		"500 Internal Server Error"
 	#define ERROR_501		"501 Not Implemented"
 	#define ERROR_505		"505 HTTP Version Not Supported"
 

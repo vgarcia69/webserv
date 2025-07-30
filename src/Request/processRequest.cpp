@@ -140,7 +140,7 @@ void	Request::handlePOST(){
 	
 	//find filename
 	size_t	startFilename = _body.find("filename=\"");
-	size_t endFilename = _body.find("\"\r\n", startFilename + 10);
+	size_t	endFilename = _body.find("\"\r\n", startFilename + 10);
 	if (startFilename == std::string::npos || endFilename == std::string::npos){	
 		_error = ERROR_400;
 		return (handleError());
@@ -152,25 +152,38 @@ void	Request::handlePOST(){
 		return (handleError());
 	}
 
-	std::cout << "\n\n\n\n\nici : [" << NameFile  << "]\n\n\n\n\n\n\n\n\n\n\n" << startFilename << " - " << endFilename << std::endl;
-
-
-	size_t endHeader = _body.find("\r\n\r\n");
+	NameFile = _URI + "/" + NameFile;
+	
+	size_t endHeader = _body.find("\r\n\r\n") + 4;
 	if (endHeader == std::string::npos){	
 		_error = ERROR_400;
 		return (handleError());
 	}
 	std::ofstream file(NameFile.c_str());
-	file << _body.substr(endHeader);
+	if (!file){
+		_error = ERROR_500;
+		return (handleError());
+	}
 	
-	
-	//si 201 Created, inclure le Location: URI
+	std::vector<size_t>		newLine;
+	newLine.push_back(endHeader);
+	size_t	temp;
+	while ((temp = _body.find("\r\n", newLine.back() + 1)) != std::string::npos){
+		newLine.push_back(temp);
+	}
 
-	_HTTPresponse << "HTTP/1.1 204 No Content\r\n";
+	file << _body.substr(endHeader, newLine[newLine.size() - 2] - endHeader);
+	
+	if (!file){
+		_error = ERROR_500;
+		return (handleError());
+	}
+
+	_HTTPresponse << "HTTP/1.1 201 Created\r\n";
 	processHeader();
-	//----------------------------------------------------------------- avec 201 DOIT indiquer l'URI du fichier créer
-	// _HTTPresponse << "Location: " << "127.0.0.1:8003/" << _URI <<"\r\n";
-	_HTTPresponse << "\r\n";
+	_HTTPresponse << "Location: " << NameFile << "\r\n";
+	_HTTPresponse << "Content-Length: 0\r\n";
+	_HTTPresponse << "\r\n"; 
 }
 
 void	Request::handleDELETE(){

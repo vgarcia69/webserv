@@ -19,8 +19,6 @@
 
 			std::string		m_response;
 
-			//Request			request;
-
 			int				getPort();
 			std::string&	getIPAdress();
 			int				getSocketFD();
