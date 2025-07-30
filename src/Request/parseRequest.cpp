@@ -166,6 +166,11 @@ void		Request::parsBody(std::string &clientRequest){
 		}
 		_body = clientRequest.substr(0, nb_char);
 	}
+
+	if (_header["content-type"].find("multipart/form-data; boundary")){
+		_error = ERROR_501;
+		return ;
+	}
 }
 
 void		Request::parsRequest(std::string clientRequest){
