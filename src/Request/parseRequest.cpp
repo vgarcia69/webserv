@@ -92,11 +92,6 @@ void		Request::parsHeader(std::string & clientRequest){
 
 	while(line.empty() == false){
 		to_lower(line);
-		//old version
-		// if (clientRequest.eof()){
-		// 	_error = ERROR_400;
-		// 	return ;
-		// }
 		size_t	posSep = line.find(':');
 		if (posSep == std::string::npos || posSep >= lenLine + 2){	//+2 for :	_header[key] = line.substr(posSep + 1);
 			_error = ERROR_400;
@@ -128,7 +123,10 @@ void		Request::parsHeader(std::string & clientRequest){
 		if (!line.empty() && line[lenLine - 1] == '\r') {
 			line.erase(line.size() - 1);
 			--lenLine;
-			/*---------------------------------------------------------------------------------------ici faire une erreur?*/
+		}
+		else {
+			_error = ERROR_400;
+			return ;
 		}
 	}
 
