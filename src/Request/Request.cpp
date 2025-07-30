@@ -1,6 +1,7 @@
 #include "Request.hpp"
 
-//----------------------------------------------------------------------------------probablement les 3/4 qui ne sont pas utilisé
+Request::Request(void): _HTTPresponse(""){}
+
 const std::string& Request::getMethod() const {
     return _method;
 }

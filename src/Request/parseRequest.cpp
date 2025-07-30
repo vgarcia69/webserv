@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request(void): _HTTPresponse(""){}
+
 
 void		Request::parsFirstLine(std::string &clientRequest) {
 	
@@ -87,7 +87,10 @@ void		Request::parsHeader(std::string & clientRequest){
 	if (!line.empty() && line[lenLine - 1] == '\r') {
 		line.erase(lenLine - 1, 1);
 		--lenLine;
-		/*---------------------------------------------------------------------------------------ici faire une erreur?*/
+	}
+	else {
+		_error = ERROR_400;
+		return ;
 	}
 
 	while(line.empty() == false){
