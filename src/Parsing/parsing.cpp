@@ -27,8 +27,6 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 	if (keyword == "}")
 	{
 		state = GLOBAL;
-		if (m_servers.back().getLocations().empty())
-			throw std::runtime_error("No locations");
 		return ;
 	}
 	sequenced_line >> info;

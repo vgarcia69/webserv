@@ -45,7 +45,7 @@ std::string Request::checkURI()
 			break ;
 		else
 			uri.erase(pos);
-		std::cout << BLUE << uri  << RESET<< std::endl;
+		std::cout << BLUE << uri << RESET<< std::endl;
     	for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++)
     	{
     		std::string loc_path	= it->first;
@@ -71,6 +71,8 @@ std::string Request::checkURI()
 			else
     			std::cerr << "Root: "<< _servers[_server_index].getInfo(ROOT) << "\n loc path: ."<< loc_path << ". : ." << uri <<"."<< std::endl;
     	}
+		if (_servers[_server_index].getInfo(ROOT) == uri && _method.size() == 3)
+			return "OK";
     }
 	std::cerr << RED "CHECK URI: Nothing Found" RESET << std::endl;
 	return ERROR_404;
