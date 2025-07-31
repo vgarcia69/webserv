@@ -4,6 +4,8 @@
 	#include <string>
 	#include "Request.hpp"
 
+	class Request;
+
 	class Client
 	{
 		private:
@@ -18,6 +20,8 @@
 			~Client();
 
 			std::string		m_response;
+
+			Request			request;
 
 			int				getPort();
 			std::string&	getIPAdress();

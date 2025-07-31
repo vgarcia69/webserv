@@ -153,25 +153,71 @@ void		Request::parsBody(std::string &clientRequest){
 
 	//case of POST method
 
-	if (_header.find("content-length") == _header.end() ){
-		_error = ERROR_411;
-	}
-	else
+	//extract Boundary
 	{
+		if (_header.find("content-type") == _header.end() ){
+			_error = ERROR_501;
+			return;
+		}
+		size_t startBoundary = _header["content-type"].find("multipart/form-data; boundary=");
+		if (startBoundary == std::string::npos){
+			_error = ERROR_501;
+			return ;
+		}
+		startBoundary += 30;
+		size_t endBoundary = _header["content-type"].find(";", startBoundary);
+		if (endBoundary == std::string::npos)
+		{
+			_boundary = _header["content-type"].substr(startBoundary);
+		}
+		else {
+			_boundary = _header["content-type"].substr(startBoundary, endBoundary);
+		}
+	}
+	
+	//extract len of body
+	{
+		if (_header.find("content-length") == _header.end() ){
+			_error = ERROR_411;
+			return;
+		}
+		errno = 0;
 		long int nb_char = strtol(_header["content-length"].c_str(), NULL, 10);
 		if (errno == ERANGE || nb_char < 0){
 			errno = 0;
 			_error = ERROR_400;
 			return ;
 		}
-		_body = clientRequest.substr(0, nb_char);
+		_lenBody = nb_char;
+		//---------------------------------------------------------------------------------------mettre la limite de charactere
+		if (_lenBody > 10000000000000){
+			_error = ERROR_413;
+			//-----------------------------------------------------------------fermer la connection ici ou dans le handle error
+			return ;
+		}
 	}
-
-	if (_header["content-type"].find("multipart/form-data; boundary")){
-		_error = ERROR_501;
-		return ;
+	_body = clientRequest;
+	if (_body.size() < _lenBody){
+		_notEnd = true;
 	}
 }
+
+void		Request::addBody(std::string clientRequest){
+	//check if _boundary is in the good place
+	if (clientRequest.find(_boundary) == std::string::npos){
+		_error = ERROR_400;
+		///-------------------------------------------------------remove connection ici ?
+	}
+
+	//check if the end delimiter is present
+	if (clientRequest.find((_boundary + "--")))
+	{
+		_notEnd = false;
+	}
+
+	_body += clientRequest;
+}
+
 
 void		Request::parsRequest(std::string clientRequest){
 

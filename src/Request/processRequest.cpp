@@ -43,8 +43,6 @@ void Request::handleRequest(void) {
 			//free des choses ???????????????????????????
 			close(fd[1]);
 		}
-
-
 	}
 	else {
 		std::map<std::string, void (Request::*)()>::const_iterator it = _methodMap.find(_method);
@@ -61,15 +59,15 @@ void	Request::processHeader(){
 	char buffer[100];
 	std::strftime(buffer, sizeof(buffer), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", timeGMT);
 
-	_HTTPresponse << buffer;
+	*_HTTPresponse << buffer;
 
 	//name					---------------------------------------------------------------------------------------------------------- mettre le vrai nom du server
-	_HTTPresponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
+	*_HTTPresponse << "Server: " << "NameOfTheServer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << "\r\n";
 
 
 	if (_error == ERROR_413){
 		//------------------------------------------------------------------------------------------------- fermer la connexion
-		_HTTPresponse << "Connection: close\r\n";
+		*_HTTPresponse << "Connection: close\r\n";
 	}
 	else{
 		//------------------------------------------------------------------------------------------------- chercher les info du serveur;
@@ -86,24 +84,27 @@ void	Request::processHeader(){
 
 
 void	Request::handleError(){
-	_HTTPresponse << "HTTP/1.1 " << _error << "\r\n";
+	*_HTTPresponse << "HTTP/1.1 " << _error << "\r\n";
 	processHeader();
 	if (_error == ERROR_405){
-		_HTTPresponse << "Allow:" ;
+		*_HTTPresponse << "Allow:" ;
 		for (std::map<std::string, void(Request::*)()>::const_iterator it = _methodMap.begin(); it != _methodMap.end(); ++it){
-			_HTTPresponse << " " << it->first;
+			*_HTTPresponse << " " << it->first;
 		}
-		_HTTPresponse << "\r\n\r\n";
+		*_HTTPresponse << "\r\n";
 	}
+	*_HTTPresponse << "Content-Length: 0\r\n";
+	*_HTTPresponse << "\r\n";
+
 	//-------------------------------------------------------------------------------------------si erreur 401 doit faire qqc de special.
 }
 
 void	Request::handleGET(){
 	std::ifstream	file(_URI.c_str());
 	if (!file){
-		_HTTPresponse << "HTTP/1.1 " << ERROR_404 <<  "\r\n";
+		*_HTTPresponse << "HTTP/1.1 " << ERROR_404 <<  "\r\n";
 		processHeader();
-		_HTTPresponse <<  "Content-Type: text/html; charset=UTF-8\r\n";
+		*_HTTPresponse <<  "Content-Type: text/html; charset=UTF-8\r\n";
 		std::string page;
 		page += "<html>\r\n";
 		page += "<head><title>404 Not Found</title></head>\r\n";
@@ -113,8 +114,8 @@ void	Request::handleGET(){
 		page += "	</body>\r\n";
 		page += "</html>\r\n";
 		page += "\r\n";
-		_HTTPresponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
-		_HTTPresponse <<  page;
+		*_HTTPresponse <<  "Content-Length: " <<  page.length() <<  "\r\n\r\n";
+		*_HTTPresponse <<  page;
 		return ;
 	}
 	
@@ -126,10 +127,10 @@ void	Request::handleGET(){
 		page += '\n';
 	}
 
-	_HTTPresponse << "HTTP/1.1 200 OK\r\n";
+	*_HTTPresponse << "HTTP/1.1 200 OK\r\n";
 	processHeader();
-	_HTTPresponse << "Content-Length: " << page.length() << "\r\n\r\n";
-	_HTTPresponse << page;
+	*_HTTPresponse << "Content-Length: " << page.length() << "\r\n\r\n";
+	*_HTTPresponse << page;
 }
 
 
@@ -171,6 +172,11 @@ void	Request::handlePOST(){
 	while ((temp = _body.find("\r\n", newLine.back() + 1)) != std::string::npos){
 		newLine.push_back(temp);
 	}
+	if (newLine.size() < 2){
+		_error = ERROR_400;
+		return (handleError());
+	}
+
 
 	file << _body.substr(endHeader, newLine[newLine.size() - 2] - endHeader);
 	
@@ -179,36 +185,36 @@ void	Request::handlePOST(){
 		return (handleError());
 	}
 
-	_HTTPresponse << "HTTP/1.1 201 Created\r\n";
+	*_HTTPresponse << "HTTP/1.1 201 Created\r\n";
 	processHeader();
-	_HTTPresponse << "Location: " << NameFile << "\r\n";
-	_HTTPresponse << "Content-Length: 0\r\n";
-	_HTTPresponse << "\r\n"; 
+	*_HTTPresponse << "Location: " << NameFile << "\r\n";
+	*_HTTPresponse << "Content-Length: 0\r\n";
+	*_HTTPresponse << "\r\n"; 
 }
 
 void	Request::handleDELETE(){
 	if (std::remove(_URI.c_str()) == 0) {
-		_HTTPresponse << "HTTP/1.1 200 OK\r\n";
+		*_HTTPresponse << "HTTP/1.1 200 OK\r\n";
 		processHeader();
-		_HTTPresponse << "\r\n";
+		*_HTTPresponse << "\r\n";
 		return ;
 	}
 	
 	switch (errno) {
 		case ENOENT:
-			_HTTPresponse << "HTTP/1.1 404 Not Found\r\n";
+			*_HTTPresponse << "HTTP/1.1 404 Not Found\r\n";
 			break ;
 		case EACCES:
-			_HTTPresponse << "HTTP/1.1 403 Forbidden\r\n";
+			*_HTTPresponse << "HTTP/1.1 403 Forbidden\r\n";
 			break ;
 		case EBUSY:
-			_HTTPresponse << "HTTP/1.1 409 Conflict\r\n";
+			*_HTTPresponse << "HTTP/1.1 409 Conflict\r\n";
 			break ;
 		case EROFS:
-			_HTTPresponse << "HTTP/1.1 403 Forbidden\r\n";
+			*_HTTPresponse << "HTTP/1.1 403 Forbidden\r\n";
 			break ;
 		default:
-			_HTTPresponse << "HTTP/1.1 500 Internal Server Error\r\n";
+			*_HTTPresponse << "HTTP/1.1 500 Internal Server Error\r\n";
 			break ;
 	}
 	processHeader();

@@ -25,7 +25,10 @@ private :
 	std::map<std::string, std::string>	_header;
 	std::string							_body;
 	std::string							_error;
-	std::ostringstream					_HTTPresponse;
+	std::ostringstream * 				_HTTPresponse;
+	bool								_notEnd;
+	std::string							_boundary;
+	size_t								_lenBody;
 
 	//parse function
 	void	parsFirstLine(std::string & clientRequest);
@@ -45,19 +48,23 @@ private :
 
 public :
 	Request();
-	~Request(){};
+	Request(const Request& other);
+	Request & operator=(const Request& other);
+	~Request();
 
+	void		addBody(std::string clientRequest);
 	void		parsRequest(std::string clientRequest);
 	void		handleRequest();
 
 	//getter
-	const std::string& getMethod() const;
-	const std::string& getURI() const;
+	const std::string&	getMethod() const;
+	const std::string&	getURI() const;
 	const std::map<std::string, std::string>& getHeader() const;
-	const std::string getHeader(const std::string& key);
-	const std::string& getBody() const;
-	const std::string& getError() const;
-	std::string getHTTPresponse();
+	const std::string	getHeader(const std::string& key);
+	const std::string&	getBody() const;
+	const std::string&	getError() const;
+	std::string 		getHTTPresponse();
+	bool				getNotEnd() const;
 };
 
 std::ostream & operator<<(std::ostream &o, Request & request);

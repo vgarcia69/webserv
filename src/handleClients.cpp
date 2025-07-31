@@ -48,19 +48,25 @@ void	handleRequest(int& client_fd, epoll_event& event, std::map<int, Client>& cl
 {
 	if (!clients[client_fd].readSocket(client_fd, 0))
 	{
+		//-----------------------------------------pourquoi tu remove la connexion??
 		removeConnexion(event, clients);
 		return ;
 	}
 	
-	Request request;
-
 	std::cout << clients[client_fd].getProcessRequest() <<std::endl;
+	if (clients[client_fd].request.getNotEnd()){
+		clients[client_fd].request.addBody(clients[client_fd].getProcessRequest());
+	}
+	else {
+		clients[client_fd].request.parsRequest(clients[client_fd].getProcessRequest());
+	}
+	if (clients[client_fd].request.getNotEnd()){
+		return ;
+	}
+	// std::cout << clients[client_fd].request << std::endl;
+	clients[client_fd].request.handleRequest();
 
-	request.parsRequest(clients[client_fd].getProcessRequest());
-	std::cout << request << std::endl;
-	request.handleRequest();
-
-	clients[client_fd].m_response = request.getHTTPresponse();
+	clients[client_fd].m_response = clients[client_fd].request.getHTTPresponse();
 	std::cout << "reponse is :\n" << clients[client_fd].m_response << std::endl;
 	unsigned sent = send(client_fd, clients[client_fd].m_response.c_str(), clients[client_fd].m_response.length(), 0);
 
