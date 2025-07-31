@@ -25,6 +25,16 @@ static	std::string	getMethods(Location &loc)
 	return message;
 }
 
+int findSecondLast(const std::string& str, char c) {
+    size_t lastPos = str.rfind(c);
+    if (lastPos == std::string::npos) {
+        return -1;
+    }
+    
+    size_t secondLastPos = str.rfind(c, lastPos - 1);
+    return (secondLastPos == std::string::npos) ? -1 : secondLastPos;
+}
+
 std::string Request::checkURI()
 {
 	Server							server    = _servers[_server_index];
@@ -37,21 +47,22 @@ std::string Request::checkURI()
 		return ERROR_400;
 	}
 	
+	std::cout << BLUE << _URI << RESET << std::endl;
 	while (uri.find("/") != std::string::npos)
 	{
-		size_t pos = uri.find_last_of("/");
+		size_t pos = uri.find_last_of('/');
 		if (pos == std::string::npos)
 			break ;
 		else
-			uri.erase(pos);
+			uri.erase(pos + 1);
 		std::cout << BLUE << uri  << RESET<< std::endl;
     	for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++)
     	{
     		std::string loc_path	= it->first;
     		Location	current_loc	= it->second;
     		
-    		std::cout << loc_path << " : " << _URI << std::endl;
-    		if (loc_path == uri)
+    		std::cout << "Root: "<< server.getInfo(ROOT) << "\n loc path: "<< loc_path << " : " << uri << std::endl;
+    		if (loc_path == uri || server.getInfo(ROOT) == uri)
     		{
     			current_loc.getInfo(POST);
     			switch (_method.size())
@@ -71,6 +82,7 @@ std::string Request::checkURI()
     		}
     	}
     }
+	std::cerr << RED "CHECK URI: Nothing Found" RESET << std::endl;
 	return ERROR_404;
 }
 

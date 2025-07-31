@@ -32,6 +32,7 @@
 
 	#define ERROR_000	"TEST"	//-------------DELETE
 	#define ERROR_400	"400 Bad Request"
+	#define ERROR_403	"403 Forbidden"
 	#define ERROR_404	"404 File Not Found"
 	#define ERROR_405	"405 Method Not Allowed"
 	#define ERROR_411	"411 Length Required"

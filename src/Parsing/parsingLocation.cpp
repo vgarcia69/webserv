@@ -10,6 +10,7 @@ void	Config::parsingLocationInfo(std::stringstream& sequenced_line, ParsingState
 	{
 		state = SERVER_BLOCK;
 		m_servers.back().addLocation(m_currentLoc, m_currentLoc.m_root);
+		m_currentLoc.clear();
 		return ;
 	}
 	else if (keyword == METHODS)
@@ -109,7 +110,7 @@ void	Config::parseReturn(std::string info)
 	    	root.clear();
 	}
 	root += info;
-	// std::cerr << root <<" info: "<< info <<  std::endl;
+	std::cerr << root <<" info: "<< info <<  std::endl;
 	if (access(root.c_str(), F_OK | R_OK))
 		throw std::runtime_error("Invalid Return Redirection");
 	addLocationInfo(RETURN, root);

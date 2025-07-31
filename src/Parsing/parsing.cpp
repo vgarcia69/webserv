@@ -9,18 +9,18 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 	if (keyword == LOCATION)
 	{
 		sequenced_line >> info;
-		info.insert(0, 1, '.');
+		info.erase(0, 1);
 		std::string root = m_servers.back().getInfo(ROOT);
 		if (root == NOT_FOUND)
 			root.clear();
 		root += info;
+		if (root[root.length() - 1] != '/')
+			root.append("/");
 
-		std::cout << root << std::endl;
 		if (!isDirectory(root))
 			throw std::runtime_error("Invalid Location Path");
-		m_servers.back().addLocation(m_currentLoc, root);
-		std::cout << "Adding " GREEN << root << RESET << std::endl;
 		m_currentLoc.clear();
+		m_currentLoc.m_root = root;
 		state = LOOKING_FOR_LOCATION_BLOCK;
 		return ;
 	}

@@ -22,6 +22,7 @@ Server::~Server()
 
 void	Server::addLocation(Location loc, std::string& root)
 {
+	std::cout << "Adding Location: " GREEN << root << RESET << std::endl;
 	m_locations[root] = loc;
 }
 

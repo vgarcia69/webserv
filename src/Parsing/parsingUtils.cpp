@@ -118,6 +118,8 @@ void	Config::checkRoot(std::string& info)
 		else if (info[i + 1] == '.')
 			throw std::runtime_error("Action not permitted");
 	}
+	if (info[info.length() - 1] != '/')
+		info.append("/");
 
 	if (!isDirectory(info))
 		throw std::runtime_error("Root Information Invalid");

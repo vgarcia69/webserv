@@ -38,14 +38,15 @@ void		Request::parsFirstLine(std::string &clientRequest) {
 		_error += " No URI";
 		return ;
 	}
-	if (_URI == "/"){
-		//------------------------------------------------------------------------------------ici mettre la page par default
-		_URI = "pageParDefault.html";
-	}
-	else if (_URI[0] == '/'){
+	if (_URI[0] == '/'){
 		_URI.erase(0,1);
 	}
-	if (space2 == std::string::npos || _URI.empty()){
+	if (_URI[_URI.length() - 1] == '/')
+	{
+		_error = ERROR_404;
+		return ;
+	}
+	if (space2 == std::string::npos){
 		_error =  ERROR_400;
 		return ;
 	}
@@ -143,11 +144,18 @@ void		Request::parsHeader(std::string & clientRequest){
 		_server_index = getServerIndex(_header["host"]);
 	}
 	
+	if (_URI.empty())
+		_URI = _servers[_server_index].getInfo(DEFAULT_FILE);
+	else if (access(_URI.c_str(), F_OK | R_OK))
+	{
+		_error = ERROR_403;
+		return ;
+	}
 	std::string URIchecking = checkURI();
 	if (URIchecking != "OK")
 	{
 		_error = URIchecking;
-		std::cout << YELLOW << _error  << RESET << std::endl;
+		std::cout << YELLOW << "Error: " << _error  << RESET << std::endl;
 		return ;
 	}
 }

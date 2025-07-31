@@ -69,4 +69,5 @@ public :
 
 std::ostream & operator<<(std::ostream &o, Request & request);
 
+bool	isDirectory(const std::string& path);
 #endif
