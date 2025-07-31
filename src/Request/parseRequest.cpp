@@ -146,7 +146,7 @@ void		Request::parsHeader(std::string & clientRequest){
 	
 	if (_URI.empty())
 		_URI = _servers[_server_index].getInfo(DEFAULT_FILE);
-	else if (access(_URI.c_str(), F_OK | R_OK))
+	if (access(_URI.c_str(), F_OK | R_OK))
 	{
 		_error = ERROR_403;
 		return ;

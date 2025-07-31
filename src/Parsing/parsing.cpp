@@ -14,8 +14,8 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 		if (root == NOT_FOUND)
 			root.clear();
 		root += info;
-		if (root[root.length() - 1] != '/')
-			root.append("/");
+		if (root[root.length() - 1] == '/')
+			root.erase(root.length() - 1, 1);
 
 		if (!isDirectory(root))
 			throw std::runtime_error("Invalid Location Path");
@@ -27,6 +27,8 @@ void	Config::parsingServerInfo(std::stringstream& sequenced_line, ParsingState& 
 	if (keyword == "}")
 	{
 		state = GLOBAL;
+		if (m_servers.back().getLocations().empty())
+			throw std::runtime_error("No locations");
 		return ;
 	}
 	sequenced_line >> info;

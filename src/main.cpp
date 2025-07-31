@@ -27,14 +27,8 @@ int main(int ac, char **av)
 	}
 	catch (std::exception &e)
 	{
-		std::cout << YELLOW << std::endl;
 		std::cout << e.what() << std::endl;
 		return 1;
-	}
-	catch (...)
-	{
-		std::cout << BLUE << std::endl;
-		return 0;
 	}
 	std::cout << RED << std::endl;
 	return 0;

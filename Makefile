@@ -7,7 +7,7 @@ SRCFILE := $(addprefix $(SRCDIR), $(SRCFILE))
 SRCFILE := $(addsuffix $(SRCFORMAT), $(SRCFILE))
 CXX = c++
 INCLUDE = include
-FLAGS = -Wall -Wextra -Werror -std=c++98 -I$(INCLUDE) -MMD -g3
+FLAGS = -Wall -Wextra -std=c++98 -I$(INCLUDE) -MMD -g3
 
 OBJ_DIR = .obj/
 

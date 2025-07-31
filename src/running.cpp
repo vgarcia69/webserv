@@ -48,7 +48,7 @@ void	runServers(std::vector<Server>& servers)
 		fd_num = epoll_wait(Server::s_epoll_fd, events, SOMAXCONN, -1);
 		if (fd_num == -1)
 		{
-			if (!g_flag)
+			if (g_flag)
 				return ;
 			throw std::runtime_error("EPoll Function Cancelled");
 		}

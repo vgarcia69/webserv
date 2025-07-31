@@ -25,21 +25,11 @@ static	std::string	getMethods(Location &loc)
 	return message;
 }
 
-int findSecondLast(const std::string& str, char c) {
-    size_t lastPos = str.rfind(c);
-    if (lastPos == std::string::npos) {
-        return -1;
-    }
-    
-    size_t secondLastPos = str.rfind(c, lastPos - 1);
-    return (secondLastPos == std::string::npos) ? -1 : secondLastPos;
-}
-
 std::string Request::checkURI()
 {
-	Server							server    = _servers[_server_index];
 	std::string						uri		  = _URI;
-	std::map<std::string, Location> locations = server.getLocations();
+	std::map<std::string, Location> locations = _servers[_server_index].getLocations();
+
 
 	if (_URI.find("..") != std::string::npos)
 	{
@@ -54,17 +44,15 @@ std::string Request::checkURI()
 		if (pos == std::string::npos)
 			break ;
 		else
-			uri.erase(pos + 1);
+			uri.erase(pos);
 		std::cout << BLUE << uri  << RESET<< std::endl;
     	for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++)
     	{
     		std::string loc_path	= it->first;
     		Location	current_loc	= it->second;
     		
-    		std::cout << "Root: "<< server.getInfo(ROOT) << "\n loc path: "<< loc_path << " : " << uri << std::endl;
-    		if (loc_path == uri || server.getInfo(ROOT) == uri)
+    		if (!strcmp(loc_path.c_str(), uri.c_str()))
     		{
-    			current_loc.getInfo(POST);
     			switch (_method.size())
     			{
     				case 3:
@@ -80,6 +68,8 @@ std::string Request::checkURI()
     					return ERROR_405 + getMethods(current_loc);
     			}
     		}
+			else
+    			std::cerr << "Root: "<< _servers[_server_index].getInfo(ROOT) << "\n loc path: ."<< loc_path << ". : ." << uri <<"."<< std::endl;
     	}
     }
 	std::cerr << RED "CHECK URI: Nothing Found" RESET << std::endl;
